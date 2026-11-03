@@ -8,12 +8,12 @@ fn the_test_compound_writer_reads_back() {
     let big: Vec<u8> = (0..3_000_000u32).map(|i| (i % 253) as u8).collect();
     let mid: Vec<u8> = (0..4095u32).map(|i| i as u8).collect();
     let file = compound_file(&[("Small", b"hello"), ("Big", &big), ("Empty", b""), ("Mid", &mid)]);
-    let cf = crate::cfb::Compound::open(&file).unwrap();
-    assert_eq!(cf.root_stream("Mid").unwrap().unwrap(), mid, "just under the cutoff: the mini stream");
-    assert_eq!(cf.root_stream("Small").unwrap().unwrap(), b"hello");
-    assert_eq!(cf.root_stream("big").unwrap().unwrap(), big);
-    assert_eq!(cf.root_stream("Empty").unwrap().unwrap(), b"");
-    assert_eq!(cf.root_stream("Missing").unwrap(), None);
+    let cf = craft_cfb::Cfb::open(&file).unwrap();
+    assert_eq!(cf.read_stream("Mid").unwrap(), mid, "just under the cutoff: the mini stream");
+    assert_eq!(cf.read_stream("Small").unwrap(), b"hello");
+    assert_eq!(cf.read_stream("big").unwrap(), big);
+    assert_eq!(cf.read_stream("Empty").unwrap(), b"");
+    assert!(matches!(cf.read_stream("Missing"), Err(craft_cfb::Error("stream not found"))));
 }
 
 #[test]

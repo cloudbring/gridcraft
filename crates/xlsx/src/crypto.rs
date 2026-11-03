@@ -10,8 +10,8 @@
 use aes::cipher::{BlockCipherDecrypt, KeyInit};
 use sha2::Digest;
 
-use crate::cfb::Compound;
 use crate::xml::El;
+use craft_cfb::Cfb;
 
 /// Spin counts above this are refused (the cap sheet-protection hashes use too).
 const MAX_SPIN_COUNT: u32 = 10_000_000;
@@ -74,9 +74,15 @@ pub fn check_encryption(bytes: &[u8]) -> Result<(), DecryptError> {
 /// The `EncryptionInfo` and `EncryptedPackage` streams. Rights management (IRM) keeps the
 /// package but describes its encryption elsewhere, with no `EncryptionInfo`.
 fn streams(bytes: &[u8]) -> Result<(Vec<u8>, Vec<u8>), DecryptError> {
-    let cf = Compound::open(bytes).map_err(malformed)?;
-    let info = cf.root_stream("EncryptionInfo").map_err(malformed)?;
-    let package = cf.root_stream("EncryptedPackage").map_err(malformed)?.ok_or_else(|| malformed("no EncryptedPackage stream"))?;
+    let cf = Cfb::open(bytes).map_err(|e| malformed(e.to_string()))?;
+    // `Error("stream not found")` means the stream is absent; every other error is damage.
+    let read = |name: &str| match cf.read_stream(name) {
+        Ok(data) => Ok(Some(data)),
+        Err(craft_cfb::Error("stream not found")) => Ok(None),
+        Err(e) => Err(malformed(e.to_string())),
+    };
+    let info = read("EncryptionInfo")?;
+    let package = read("EncryptedPackage")?.ok_or_else(|| malformed("no EncryptedPackage stream"))?;
     let info = info.ok_or_else(|| DecryptError::Unsupported("rights-management".into()))?;
     Ok((info, package))
 }

@@ -1,5 +1,6 @@
 //! Legacy Excel 97-2003 `.xls` (BIFF8) import, implemented from Microsoft's public
-//! specifications [MS-CFB] (the compound file container) and [MS-XLS] (the Workbook stream):
+//! specifications [MS-XLS] (the Workbook stream) and [MS-CFB] (the compound file container,
+//! read by the shared `craft-cfb` crate):
 //! <https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/cd03cb5f-ca02-4934-a391-bb674cb8aa06>.
 //!
 //! Read: worksheets, shared strings, cell values, formulas (text and cached results, including
@@ -22,9 +23,9 @@ use std::sync::Arc;
 use gridcraft_core::{CellRef, DateSystem, MAX_COLS, MAX_ROWS, RangeRef, Value};
 use gridcraft_model::{CalcMode, CalcSettings, Cell, DefinedName, Formula, LineInfo, Sheet, StyleId, Visibility, Workbook};
 
-use crate::cfb::Compound;
 use crate::tables::{col_width_to_px, pt_to_px};
 use crate::{IoError, ReadReport};
+use craft_cfb::{Cfb, EntryKind};
 use formula::{Links, Mode, SupBook, Unsupported, Xti, cell_error, decode};
 use records::{Cursor, Record, Records};
 
@@ -58,8 +59,13 @@ const ENCRYPTED: &str =
 /// Whether the bytes are a compound file holding an Excel workbook stream (BIFF8 `Workbook`
 /// or BIFF5 `Book`).
 pub(crate) fn is_xls(bytes: &[u8]) -> bool {
-    let Ok(cf) = Compound::open(bytes) else { return false };
-    cf.has_root_stream("Workbook") || cf.has_root_stream("Book")
+    let Ok(cf) = Cfb::open(bytes) else { return false };
+    has_stream(&cf, "Workbook") || has_stream(&cf, "Book")
+}
+
+/// Whether the root storage holds a stream called `name` (case-insensitive), without reading it.
+fn has_stream(cf: &Cfb, name: &str) -> bool {
+    cf.entries().any(|e| e.kind() == EntryKind::Stream && e.path().eq_ignore_ascii_case(name))
 }
 
 /// Most shared formulas one sheet expands, and the longest template text one attach may
@@ -148,15 +154,16 @@ pub fn read_xls(bytes: &[u8]) -> Result<(Workbook, ReadReport), IoError> {
 
 /// [`read_xls`] with an explicit resource budget.
 pub(crate) fn read_xls_with(bytes: &[u8], mut budget: Budget) -> Result<(Workbook, ReadReport), IoError> {
-    let cf = Compound::open(bytes).map_err(invalid)?;
-    let stream = match cf.root_stream("Workbook").map_err(invalid)? {
-        Some(s) => s,
-        None => {
-            if cf.has_root_stream("Book") {
+    let cf = Cfb::open(bytes).map_err(|e| invalid(e.to_string()))?;
+    let stream = match cf.read_stream("Workbook") {
+        Ok(s) => s,
+        Err(craft_cfb::Error("stream not found")) => {
+            if has_stream(&cf, "Book") {
                 return Err(invalid("Excel 5.0/95 workbooks (BIFF5) are not supported; save the file as .xlsx in Excel and try again."));
             }
             return Err(invalid("the file has no Workbook stream, so it is not an Excel workbook"));
         }
+        Err(e) => return Err(invalid(e.to_string())),
     };
     let mut report = ReadReport::default();
     let g = globals(&stream, &mut budget, &mut report)?;

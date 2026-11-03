@@ -29,6 +29,9 @@ gridcraft-math = { path = "crates/math" }
 # the app) comes from one storytold/craft-libs revision.
 # craft-update: app-specific pretend versions apply to startup and manual checks.
 craft-update = { git = "https://github.com/storytold/craft-libs", rev = "c5a1cbfb5f9049f9270955caffb5bee5997aebf7", version = "=0.1.0", features = ["egui"] }
+# CFB/OLE2 compound-file reading (encrypted and Excel 97-2003 workbooks), shared across the ArtCraft apps.
+# TODO: repoint to storytold/craft-libs after upstream merge
+craft-cfb = { git = "https://github.com/cloudbring/craft-libs", branch = "algo/integration" }
 
 # foundation
 thiserror = "2"

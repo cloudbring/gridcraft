@@ -722,17 +722,87 @@ fn arraytotext(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     check_len(out)
 }
 
-fn build_regex(pattern: &str, insensitive: bool) -> R<regex::Regex> {
-    if pattern.len() > MAX_TEXT {
-        return Err(CellError::Value);
+/// A small per-thread cache of compiled regexes for REGEXTEST, REGEXEXTRACT and REGEXREPLACE: a
+/// range evaluation calls them per cell, and recompiling the same pattern each time dominates the
+/// call. A compiled regex depends on the pattern text and the case flag only (the same shape as
+/// the numfmt parse cache); compiling keeps the size and nesting limits of a direct build.
+mod regex_cache {
+    use std::cell::RefCell;
+    use std::collections::HashMap;
+
+    use super::{CellError, MAX_TEXT, R};
+
+    /// Most patterns kept per thread. A full cache is emptied, so memory stays bounded.
+    pub(super) const CAPACITY: usize = 64;
+    /// Longer patterns are compiled every time and never stored.
+    pub(super) const MAX_CACHED_LEN: usize = 256;
+
+    thread_local! {
+        /// Per pattern: the case-sensitive and insensitive builds (only the used ones).
+        static CACHE: RefCell<HashMap<String, [Option<regex::Regex>; 2]>> = RefCell::new(HashMap::new());
     }
-    regex::RegexBuilder::new(pattern)
-        .case_insensitive(insensitive)
-        .size_limit(1 << 22)
-        .dfa_size_limit(1 << 22)
-        .nest_limit(100)
-        .build()
-        .map_err(|_| CellError::Value)
+
+    #[cfg(test)]
+    thread_local! {
+        static COMPILES: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    }
+
+    /// The compiled pattern for `(pattern, insensitive)`, cached when it is short enough.
+    pub(super) fn get(pattern: &str, insensitive: bool) -> R<regex::Regex> {
+        if pattern.len() > MAX_TEXT {
+            return Err(CellError::Value);
+        }
+        if pattern.len() > MAX_CACHED_LEN {
+            return compile(pattern, insensitive);
+        }
+        // Not usable (thread shutting down, re-entered): compile without the cache.
+        let cached = CACHE
+            .try_with(|c| {
+                let mut c = c.try_borrow_mut().ok()?;
+                let slot = usize::from(insensitive);
+                if let Some(pair) = c.get(pattern) {
+                    return pair.get(slot).cloned().flatten();
+                }
+                let re = compile(pattern, insensitive).ok()?;
+                if c.len() >= CAPACITY {
+                    c.clear();
+                }
+                let pair = c.entry(pattern.to_string()).or_insert([None, None]);
+                if let Some(slot) = pair.get_mut(slot) {
+                    *slot = Some(re.clone());
+                }
+                Some(re)
+            })
+            .ok()
+            .flatten();
+        cached.map(Ok).unwrap_or_else(|| compile(pattern, insensitive))
+    }
+
+    fn compile(pattern: &str, insensitive: bool) -> R<regex::Regex> {
+        #[cfg(test)]
+        COMPILES.with(|c| c.set(c.get() + 1));
+        regex::RegexBuilder::new(pattern)
+            .case_insensitive(insensitive)
+            .size_limit(1 << 22)
+            .dfa_size_limit(1 << 22)
+            .nest_limit(100)
+            .build()
+            .map_err(|_| CellError::Value)
+    }
+
+    #[cfg(test)]
+    pub(super) fn compiles() -> usize {
+        COMPILES.with(std::cell::Cell::get)
+    }
+
+    #[cfg(test)]
+    pub(super) fn cached_len() -> usize {
+        CACHE.with(|c| c.borrow().len())
+    }
+}
+
+fn build_regex(pattern: &str, insensitive: bool) -> R<regex::Regex> {
+    regex_cache::get(pattern, insensitive)
 }
 
 fn case_arg(a: &[Arg], i: usize) -> R<bool> {
@@ -1083,6 +1153,52 @@ mod tests {
     }
 
     use crate::util::testutil::*;
+
+    #[test]
+    fn regex_cache_repeats_identical_results() {
+        // #117: the second evaluation of a pattern comes from the cache and returns exactly the
+        // first's result, case flag included in the key.
+        let calls = || {
+            (
+                ev("REGEXTEST", vec![t("GridCraft 123"), t(r"\d+")]),
+                ev("REGEXTEST", vec![t("gridcraft 123"), t(r"GRIDCRAFT"), n(1.0)]),
+                ev("REGEXEXTRACT", vec![t("a1 b22 c333"), t(r"[a-z]\d+"), n(1.0)]),
+                ev("REGEXEXTRACT", vec![t("a1 b22"), t(r"([a-z])(\d)"), n(2.0)]),
+                ev("REGEXREPLACE", vec![t("one two"), t(r"(\w+)"), t("$1!"), n(2.0)]),
+            )
+        };
+        let _ = calls();
+        let before = super::regex_cache::compiles();
+        assert_eq!(calls(), calls());
+        assert_eq!(super::regex_cache::compiles() - before, 0);
+    }
+
+    #[test]
+    fn regex_cache_is_bounded() {
+        // #117: the cache holds at most CAPACITY patterns (a full one empties), repeats compile
+        // nothing, and a pattern too long for the cache still evaluates, twice compiled.
+        let before = super::regex_cache::compiles();
+        for i in 0..super::regex_cache::CAPACITY {
+            assert_eq!(ev("REGEXTEST", vec![t("x"), t(&format!("^y{{{}}}$", i))]), Value::Bool(false));
+        }
+        assert_eq!(super::regex_cache::compiles() - before, super::regex_cache::CAPACITY);
+        assert_eq!(super::regex_cache::cached_len(), super::regex_cache::CAPACITY);
+        // Fresh patterns empty the full cache rather than growing past the bound.
+        for i in 0..8 {
+            assert_eq!(ev("REGEXTEST", vec![t("x"), t(&format!("^z{{{}}}$", i))]), Value::Bool(false));
+        }
+        assert!(super::regex_cache::cached_len() <= super::regex_cache::CAPACITY);
+        let before = super::regex_cache::compiles();
+        assert_eq!(ev("REGEXTEST", vec![t("x"), t("^z{4}$")]), Value::Bool(false));
+        assert_eq!(super::regex_cache::compiles() - before, 0);
+        let long = format!("^{}$", "a".repeat(super::regex_cache::MAX_CACHED_LEN + 1));
+        let text = "a".repeat(super::regex_cache::MAX_CACHED_LEN + 1);
+        let before = super::regex_cache::compiles();
+        assert_eq!(ev("REGEXTEST", vec![t(&text), t(&long)]), Value::Bool(true));
+        assert_eq!(ev("REGEXTEST", vec![t(&text), t(&long)]), Value::Bool(true));
+        assert_eq!(super::regex_cache::compiles() - before, 2);
+        assert_eq!(super::regex_cache::cached_len(), 8);
+    }
 
     #[test]
     fn bahttext() {

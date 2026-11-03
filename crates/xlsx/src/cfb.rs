@@ -113,28 +113,26 @@ pub(crate) mod tests {
         (file, data)
     }
 
-    // The old in-crate reader tolerated a file ending inside a chain's last sector while the
-    // stream's declared bytes were all present; the shared craft-cfb reader requires every
-    // sector of a chain to be fully present, so such files are damage now (ticket #123).
-
     #[test]
-    fn an_unpadded_last_sector_is_damage() {
-        let (file, _) = unpadded(5000);
+    fn an_unpadded_last_sector_still_reads() {
+        let (file, data) = unpadded(5000);
         assert_ne!(file.len() % 512, 0);
         let cf = Cfb::open(&file).unwrap();
-        assert!(cf.read_stream("Workbook").is_err());
+        assert_eq!(cf.read_stream("Workbook").unwrap(), data);
         // One byte short of the stream's declared size is damage too.
         let cf = Cfb::open(&file[..file.len() - 1]).unwrap();
         assert!(cf.read_stream("Workbook").is_err());
     }
 
     #[test]
-    fn an_unpadded_last_mini_sector_is_damage() {
+    fn an_unpadded_last_mini_sector_still_reads() {
         let data: Vec<u8> = (0..1000u32).map(|i| (i % 251) as u8).collect();
         let mut file = crate::testing::compound_file(&[("Workbook", &data)]);
         // Header, FAT, directory, mini FAT, then the mini stream holding the stream's bytes.
         file.truncate(512 * 4 + data.len());
         let cf = Cfb::open(&file).unwrap();
+        assert_eq!(cf.read_stream("Workbook").unwrap(), data);
+        let cf = Cfb::open(&file[..file.len() - 1]).unwrap();
         assert!(cf.read_stream("Workbook").is_err());
     }
 
@@ -156,8 +154,7 @@ pub(crate) mod tests {
         let mut file = crate::testing::compound_file(&[("Small", &small), ("Workbook", &data)]);
         // "Small" holds mini sectors 0-1, "Workbook" 2-17; the mini stream starts at sector 3.
         file.truncate(512 * 4 + 128 + data.len());
-        let cf = Cfb::open(&file).unwrap();
-        assert!(cf.read_stream("Workbook").is_err());
+        assert_eq!(Cfb::open(&file).unwrap().read_stream("Workbook").unwrap(), data);
         // The cut mini sector (17) points on to sector 0 and the stream claims those bytes too.
         file[1536 + 17 * 4..1536 + 18 * 4].copy_from_slice(&0u32.to_le_bytes());
         file[1024 + 2 * 128 + 120..1024 + 2 * 128 + 124].copy_from_slice(&1064u32.to_le_bytes());

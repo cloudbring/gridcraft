@@ -910,7 +910,7 @@ dependencies = [
 [[package]]
 name = "craft-cfb"
 version = "0.1.0"
-source = "git+https://github.com/cloudbring/craft-libs?branch=algo%2Fintegration#91e0328f63f027086214472d48cfb4909d95a2a6"
+source = "git+https://github.com/cloudbring/craft-libs?branch=algo%2Fintegration#89133cd7c5d061ebd6ffcb933dd786c42794f07c"
 
 [[package]]
 name = "craft-fonts-build"

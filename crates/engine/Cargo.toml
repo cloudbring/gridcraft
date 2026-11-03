@@ -28,4 +28,5 @@ image = { workspace = true }
 
 [dev-dependencies]
 gridcraft-xlsx = { workspace = true, features = ["test-support"] }
+proptest = "1"
 zip = { workspace = true }

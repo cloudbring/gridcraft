@@ -1,5 +1,6 @@
 //! Text functions.
 
+use aho_corasick::{AhoCorasickBuilder, MatchKind};
 use gridcraft_core::parse::parse_number_text_in;
 use gridcraft_core::{CellError, Value, number_to_text};
 
@@ -568,9 +569,37 @@ fn find_matches(text: &[char], delims: &[Vec<char>], insensitive: bool, from_end
         out.reverse();
         return out;
     }
+    if ds.len() > 3 {
+        let haystack: String = t.iter().collect();
+        let patterns: Vec<String> = ds.iter().map(|d| d.iter().collect()).collect();
+        if let Ok(matcher) = AhoCorasickBuilder::new().match_kind(MatchKind::LeftmostLongest).build(&patterns) {
+            let mut positions = haystack.char_indices().map(|(byte, _)| byte).chain(std::iter::once(haystack.len())).enumerate();
+            let mut current = positions.next();
+            for hit in matcher.find_iter(&haystack) {
+                while current.is_some_and(|(_, byte)| byte < hit.start()) {
+                    current = positions.next();
+                }
+                let start = current.map_or(t.len(), |(index, _)| index);
+                while current.is_some_and(|(_, byte)| byte < hit.end()) {
+                    current = positions.next();
+                }
+                let end = current.map_or(t.len(), |(index, _)| index);
+                out.push((start, end));
+            }
+            return out;
+        }
+    }
+    let mut dispatch: [Vec<&[char]>; 256] = std::array::from_fn(|_| Vec::new());
+    for delim in &ds {
+        let mut bytes = [0; 4];
+        let first = delim[0].encode_utf8(&mut bytes).as_bytes()[0];
+        dispatch[usize::from(first)].push(delim);
+    }
     let mut i = 0;
     while i < t.len() {
-        let best = ds.iter().filter(|d| t.get(i..i + d.len()).is_some_and(|w| w == d.as_slice())).map(Vec::len).max();
+        let mut bytes = [0; 4];
+        let first = t[i].encode_utf8(&mut bytes).as_bytes()[0];
+        let best = dispatch[usize::from(first)].iter().filter(|d| t.get(i..i + d.len()).is_some_and(|w| w == **d)).map(|d| d.len()).max();
         match best {
             Some(l) => {
                 out.push((i, i + l));
@@ -1067,6 +1096,85 @@ pub(crate) fn specs() -> Vec<FnSpec> {
 #[cfg(test)]
 mod tests {
     use gridcraft_core::{CellError, Value};
+    use proptest::prelude::*;
+
+    fn old_matches(text: &[char], delims: &[Vec<char>], insensitive: bool, from_end: bool) -> Vec<(usize, usize)> {
+        let text = if insensitive { super::fold(text) } else { text.to_vec() };
+        let delims: Vec<Vec<char>> = delims.iter().filter(|d| !d.is_empty()).map(|d| if insensitive { super::fold(d) } else { d.clone() }).collect();
+        if delims.is_empty() {
+            return (0..=text.len()).map(|i| (i, i)).collect();
+        }
+        let mut matches = Vec::new();
+        if from_end {
+            let mut end = text.len();
+            while end > 0 {
+                let best = delims
+                    .iter()
+                    .filter(|d| end.checked_sub(d.len()).and_then(|start| text.get(start..end)).is_some_and(|w| w == d.as_slice()))
+                    .map(Vec::len)
+                    .max();
+                if let Some(length) = best {
+                    matches.push((end - length, end));
+                    end -= length;
+                } else {
+                    end -= 1;
+                }
+            }
+            matches.reverse();
+            return matches;
+        }
+        let mut index = 0;
+        while index < text.len() {
+            let best = delims.iter().filter(|d| text.get(index..index + d.len()).is_some_and(|w| w == d.as_slice())).map(Vec::len).max();
+            if let Some(length) = best {
+                matches.push((index, index + length));
+                index += length;
+            } else {
+                index += 1;
+            }
+        }
+        matches
+    }
+
+    proptest! {
+        #[test]
+        fn matcher_agrees_with_old_scan(
+            text in proptest::collection::vec(prop_oneof![any::<char>(), prop::sample::select(vec!['a', 'b', 'A', 'é', '😀', 'İ'])], 0..100),
+            delims in proptest::collection::vec(proptest::collection::vec(prop_oneof![any::<char>(), prop::sample::select(vec!['a', 'b', 'A', 'é', '😀', 'İ'])], 0..6), 0..12),
+            insensitive in any::<bool>(),
+        ) {
+            prop_assert_eq!(super::find_matches(&text, &delims, insensitive, false), old_matches(&text, &delims, insensitive, false));
+            prop_assert_eq!(super::find_matches(&text, &delims, insensitive, true), old_matches(&text, &delims, insensitive, true));
+            let mut overlaps = delims;
+            overlaps.extend([vec!['a', 'b'], vec!['b'], vec!['a']]);
+            prop_assert_eq!(super::find_matches(&text, &overlaps, insensitive, false), old_matches(&text, &overlaps, insensitive, false));
+            let mut start = 0;
+            let mut expected = Vec::new();
+            for (match_start, match_end) in old_matches(&text, &overlaps, insensitive, false) {
+                expected.push(text[start..match_start].to_vec());
+                start = match_end;
+            }
+            expected.push(text[start..].to_vec());
+            prop_assert_eq!(super::split_by(&text, &overlaps, insensitive), expected);
+        }
+    }
+
+    #[test]
+    #[ignore]
+    #[cfg(not(target_arch = "wasm32"))]
+    #[allow(clippy::disallowed_methods)]
+    fn benchmark_matcher_one_megabyte() {
+        let text: Vec<char> = "abcdefgh".repeat(131_072).chars().collect();
+        let delims: Vec<Vec<char>> = ["zz", "yx", "wv", "ut", "sr", "qp", "on", "ml"].iter().map(|d| d.chars().collect()).collect();
+        let start = std::time::Instant::now();
+        let old = old_matches(&text, &delims, false, false);
+        let before = start.elapsed();
+        let start = std::time::Instant::now();
+        let new = super::find_matches(&text, &delims, false, false);
+        let after = start.elapsed();
+        assert_eq!(old, new);
+        eprintln!("1 MiB, 8 delimiters: old={before:?}, new={after:?}");
+    }
 
     /// The pieces expand exactly as `regex::Captures::expand` does.
     #[test]

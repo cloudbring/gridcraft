@@ -11,3 +11,7 @@ workspace = true
 [dependencies]
 gridcraft-core = { workspace = true }
 regex = { workspace = true }
+aho-corasick = "1"
+
+[dev-dependencies]
+proptest = "1"

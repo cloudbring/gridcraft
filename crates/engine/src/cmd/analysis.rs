@@ -1325,10 +1325,13 @@ fn fft(a: &mut [(f64, f64)], inverse: bool) {
     let mut len = 2;
     while len <= n {
         let ang = sign * 2.0 * std::f64::consts::PI / len as f64;
+        // One twiddle table per stage: every butterfly of the stage reuses the same len/2
+        // factors, so the table replaces the per-butterfly sin/cos. Each factor is still
+        // computed directly, not by repeated multiplication, and the total over all stages is
+        // O(n) factors (n − 2) against the O(n log n) of the per-butterfly form.
+        let twiddles: Vec<(f64, f64)> = (0..len / 2).map(|k| ((ang * k as f64).cos(), (ang * k as f64).sin())).collect();
         for start in (0..n).step_by(len) {
-            for k in 0..len / 2 {
-                // Each twiddle factor is computed directly, not by repeated multiplication.
-                let (wr, wi) = ((ang * k as f64).cos(), (ang * k as f64).sin());
+            for (k, &(wr, wi)) in twiddles.iter().enumerate() {
                 let (i, j) = (start + k, start + k + len / 2);
                 let (Some(&(ur, ui)), Some(&(xr, xi))) = (a.get(i), a.get(j)) else { continue };
                 let (vr, vi) = (xr * wr - xi * wi, xr * wi + xi * wr);
@@ -2268,6 +2271,86 @@ mod tests {
             let cell = format!("E{}", k + 1);
             assert!(close(eval(&mut s, &format!("=IMREAL({cell})")), x(k), 2e-9), "{cell}");
             assert_eq!(eval(&mut s, &format!("=IMAGINARY({cell})")), 0.0, "{cell}");
+        }
+    }
+
+    /// Deterministic complex input for the transform tests: `n` values in [−10, 10)².
+    fn complex_input(seed: u64, n: usize) -> Vec<(f64, f64)> {
+        let mut state = seed ^ 0x9E37_79B9_7F4A_7C15;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0 - 10.0
+        };
+        (0..n).map(|_| (next(), next())).collect()
+    }
+
+    /// The O(n²) discrete Fourier transform written straight from the definition, with the 1/N
+    /// scaling of the inverse: the reference the fast kernel is checked against.
+    fn dft(a: &[(f64, f64)], inverse: bool) -> Vec<(f64, f64)> {
+        let n = a.len();
+        let sign = if inverse { 1.0 } else { -1.0 };
+        (0..n)
+            .map(|k| {
+                let mut acc = (0.0, 0.0);
+                for (j, &(re, im)) in a.iter().enumerate() {
+                    let ang = sign * 2.0 * std::f64::consts::PI * (k * j) as f64 / n as f64;
+                    let (wr, wi) = (ang.cos(), ang.sin());
+                    acc = (acc.0 + re * wr - im * wi, acc.1 + re * wi + im * wr);
+                }
+                if inverse {
+                    acc = (acc.0 / n as f64, acc.1 / n as f64);
+                }
+                acc
+            })
+            .collect()
+    }
+
+    #[test]
+    fn fft_matches_an_o_n_squared_dft() {
+        // #23: the precomputed-twiddle kernel agrees with the transform's definition,
+        // X[k] = Σ x[n]·e^(−2πikn/N) forward and the 1/N-scaled e^(+…) inverse, on seeded input.
+        for n in [2, 4, 8, 16, 64, 256] {
+            for seed in 0..4u64 {
+                let x = complex_input(seed, n);
+                let scale = x.iter().map(|(r, i)| r.abs() + i.abs()).sum::<f64>().max(1.0);
+                for inverse in [false, true] {
+                    let mut got = x.clone();
+                    super::fft(&mut got, inverse);
+                    for (k, ((gr, gi), (wr, wi))) in got.iter().zip(&dft(&x, inverse)).enumerate() {
+                        assert!((gr - wr).abs() <= 1e-9 * scale, "n={n} seed={seed} inv={inverse} k={k}: re {gr} vs {wr}");
+                        assert!((gi - wi).abs() <= 1e-9 * scale, "n={n} seed={seed} inv={inverse} k={k}: im {gi} vs {wi}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn fft_satisfies_parseval() {
+        // The unscaled forward transform keeps energy: Σ|X[k]|² = N·Σ|x[n]|².
+        for n in [2, 4, 8, 16, 64, 256] {
+            let x = complex_input(n as u64, n);
+            let mut y = x.clone();
+            super::fft(&mut y, false);
+            let energy = |v: &[(f64, f64)]| v.iter().map(|(r, i)| r * r + i * i).sum::<f64>();
+            let want = n as f64 * energy(&x);
+            assert!((energy(&y) - want).abs() <= 1e-9 * want.max(1.0), "n={n}: {} vs {want}", energy(&y));
+        }
+    }
+
+    #[test]
+    fn fft_inverse_undoes_the_forward_transform() {
+        // Forward (unscaled) then inverse (1/N) returns the input to rounding tolerance.
+        for n in [2, 4, 8, 16, 64, 256] {
+            let x = complex_input(n as u64 + 7, n);
+            let mut a = x.clone();
+            super::fft(&mut a, false);
+            super::fft(&mut a, true);
+            for (k, ((r, i), (wr, wi))) in a.iter().zip(&x).enumerate() {
+                assert!((r - wr).abs() <= 1e-9 && (i - wi).abs() <= 1e-9, "n={n} k={k}: ({r}, {i}) vs ({wr}, {wi})");
+            }
         }
     }
 

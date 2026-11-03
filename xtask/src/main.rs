@@ -7,13 +7,10 @@
 
 mod assets;
 mod i18n_report;
-mod ico;
 mod keytips;
 mod layers;
 #[cfg_attr(not(feature = "engine"), allow(dead_code))]
 mod parity;
-mod stats;
-mod version;
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode, Stdio};
@@ -44,6 +41,11 @@ commands:
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let rest: Vec<&str> = args.iter().skip(1).map(String::as_str).collect();
+    let shared_args: Vec<String> = args.iter().skip(1).cloned().collect();
+    let mut configs = craft_xtask::Configs::for_root(root());
+    configs.stats.follow_symlinks = true;
+    configs.stats.max_entries = usize::MAX;
+    configs.stats.fail_on_budget = false;
     let result = match args.first().map(String::as_str) {
         Some("assets") => assets::run(&root()),
         Some("i18n-report") => i18n_report::run(&root()),
@@ -51,16 +53,16 @@ fn main() -> ExitCode {
         Some("wasm") => cmd_wasm(),
         Some("test") => cmd_test().and_then(|()| cmd_doctest()),
         Some("ci") => cmd_ci(),
-        Some("stats") => stats::run(&root(), rest.contains(&"--exact")),
+        Some("stats") => craft_xtask::stats::run(&configs.stats, &if rest.contains(&"--exact") { vec!["--exact".into()] } else { vec![] }),
         Some("parity") => parity::run(&root(), &rest),
         Some("keytips") => keytips::run(&root(), &rest),
-        Some("ico") => ico::run(&rest),
-        Some("version") => version::run(&root(), &rest),
+        Some("ico") => craft_xtask::ico::run(&craft_xtask::ico::Config::default(), &shared_args),
+        Some("version") => craft_xtask::version::run(&configs.version, &shared_args),
         Some("-h" | "--help" | "help") | None => {
-            print!("{USAGE}");
+            print!("{}", usage());
             Ok(())
         }
-        Some(other) => Err(format!("unknown command `{other}`\n\n{USAGE}")),
+        Some(other) => Err(format!("unknown command `{other}`\n\n{}", usage())),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -69,6 +71,15 @@ fn main() -> ExitCode {
             ExitCode::FAILURE
         }
     }
+}
+
+fn usage() -> String {
+    format!(
+        "{USAGE}\nShared task syntax:\n  {}\n  {}\n  {}\n",
+        craft_xtask::version::cli_help(),
+        craft_xtask::stats::cli_help(),
+        craft_xtask::ico::cli_help().replace("ico/icns <out.ico|out.icns>", "ico <out.ico>")
+    )
 }
 
 /// Workspace root (parent of the xtask crate).
@@ -98,37 +109,9 @@ pub fn metadata() -> Result<serde_json::Value, String> {
 }
 
 fn cmd_layers() -> Result<(), String> {
-    let crates = layers::from_metadata(&metadata()?)?;
-    println!("Dependency layering (AGENTS.md \"Layering\")\n");
-    println!("{:<28} {:<10} workspace deps", "crate", "layer");
-    for c in &crates {
-        let ws: Vec<String> = c
-            .deps
-            .iter()
-            .filter(|d| d.workspace)
-            .map(|d| {
-                let k = match d.kind {
-                    layers::DepKind::Normal => "",
-                    layers::DepKind::Dev => " (dev)",
-                    layers::DepKind::Build => " (build)",
-                };
-                format!("{}{k}", layers::short_name(&d.name))
-            })
-            .collect();
-        println!("{:<28} {:<10} {}", c.name, layers::describe(layers::classify(&c.name)), ws.join(", "));
-    }
-    let violations = layers::check(&crates);
-    println!();
-    if violations.is_empty() {
-        println!("OK: {} crates, no layering violations.", crates.len());
-        Ok(())
-    } else {
-        println!("{} violation(s):", violations.len());
-        for v in &violations {
-            println!("  - {v}");
-        }
-        Err(format!("{} layering violation(s)", violations.len()))
-    }
+    let (output, violations) = layers::report(&layers::from_metadata(&metadata()?)?)?;
+    print!("{output}");
+    if violations == 0 { Ok(()) } else { Err(format!("{violations} layering violation(s)")) }
 }
 
 /// Workspace packages that must build for wasm32: every L0–L5 crate, plus the web app once it

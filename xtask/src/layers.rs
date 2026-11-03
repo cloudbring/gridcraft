@@ -3,7 +3,10 @@
 //! The rule engine works on a small, metadata-independent model so it can be
 //! unit-tested; `from_metadata` builds that model from `cargo metadata`.
 
+use craft_xtask::layers::{Config, ExternalRule, WorkspaceRule};
+pub use craft_xtask::layers::{Crate, Dep, DepKind};
 use serde_json::Value;
+use std::fmt::Write;
 
 /// Where a workspace crate sits.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,15 +15,6 @@ pub enum Class {
     Layer(u8),
     /// Binaries and build tooling: exempt from the rules.
     Exempt,
-}
-
-impl Class {
-    fn layer(self) -> Option<u8> {
-        match self {
-            Class::Layer(l) => Some(l),
-            Class::Exempt => None,
-        }
-    }
 }
 
 /// The layering table (AGENTS.md "Layering", plan/architecture.md). Names are package names
@@ -51,14 +45,6 @@ pub const TABLE: &[(&str, Class)] = &[
 /// `calc` and `xlsx` both build on `model` but not on each other.
 pub const INTRA_LAYER_ORDER: &[&[&str]] = &[&["core", "numfmt"], &["formula", "functions"], &["model", "calc"], &["model", "xlsx"]];
 
-fn intra_layer_allowed(from: &str, to: &str) -> bool {
-    let (from, to) = (short_name(from), short_name(to));
-    INTRA_LAYER_ORDER.iter().any(|chain| match (chain.iter().position(|n| *n == from), chain.iter().position(|n| *n == to)) {
-        (Some(f), Some(t)) => t < f,
-        _ => false,
-    })
-}
-
 /// Format crates may only depend on these workspace crates (on top of the layer rule), so a
 /// file format never pulls in calculation or engine code. `math` converts equations to and from
 /// OMML.
@@ -78,108 +64,6 @@ pub fn short_name(pkg: &str) -> &str {
 pub fn classify(pkg: &str) -> Option<Class> {
     let s = short_name(pkg);
     TABLE.iter().find(|(n, _)| *n == s).map(|(_, c)| *c)
-}
-
-fn is_ui_crate(name: &str) -> bool {
-    UI_CRATES.iter().any(|p| match p.strip_suffix('*') {
-        Some(prefix) => name.starts_with(prefix),
-        None => name == *p,
-    })
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DepKind {
-    Normal,
-    Dev,
-    Build,
-}
-
-#[derive(Debug, Clone)]
-pub struct Dep {
-    pub name: String,
-    pub kind: DepKind,
-    /// `true` if the dependency is a workspace member.
-    pub workspace: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct Crate {
-    pub name: String,
-    pub deps: Vec<Dep>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Violation {
-    Unregistered { krate: String },
-    Upward { krate: String, dep: String, from: u8, to: u8, kind: DepKind },
-    FormatDep { krate: String, dep: String },
-    UiBelowL6 { krate: String, dep: String, layer: u8 },
-}
-
-impl std::fmt::Display for Violation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Violation::Unregistered { krate } => {
-                write!(f, "{krate}: unknown workspace crate; register it in xtask/src/layers.rs TABLE (see plan/architecture.md §3)")
-            }
-            Violation::Upward { krate, dep, from, to, kind } => {
-                write!(f, "{krate} (L{from}) -> {dep} (L{to}) [{kind:?}]: may only depend on strictly lower layers")
-            }
-            Violation::FormatDep { krate, dep } => {
-                write!(f, "{krate}: format crates may only depend on core/formula/model, not {dep}")
-            }
-            Violation::UiBelowL6 { krate, dep, layer } => {
-                write!(f, "{krate} (L{layer}) depends on UI crate `{dep}`; UI toolkits are only allowed in L6+")
-            }
-        }
-    }
-}
-
-/// Check all rules. Returns violations sorted for stable output.
-pub fn check(crates: &[Crate]) -> Vec<Violation> {
-    let mut out = Vec::new();
-    for c in crates {
-        let Some(class) = classify(&c.name) else {
-            out.push(Violation::Unregistered { krate: c.name.clone() });
-            continue;
-        };
-        // Tooling and the L7 apps sit on top of everything.
-        let Some(layer) = class.layer().filter(|l| *l < 7) else {
-            continue;
-        };
-        let format_allowed = FORMAT_ALLOWED.iter().find(|(n, _)| *n == short_name(&c.name)).map(|(_, a)| *a);
-        for d in &c.deps {
-            // Self dev-dependencies (e.g. to enable features in tests) are fine.
-            if d.name == c.name {
-                continue;
-            }
-            if d.workspace {
-                if let Some(allowed) = format_allowed
-                    && d.kind != DepKind::Dev
-                    && !allowed.contains(&short_name(&d.name))
-                {
-                    out.push(Violation::FormatDep { krate: c.name.clone(), dep: d.name.clone() });
-                }
-                // Unregistered deps are reported on their own entry.
-                let Some(dc) = classify(&d.name) else { continue };
-                let to = dc.layer().unwrap_or(u8::MAX);
-                if to >= layer && !(to == layer && intra_layer_allowed(&c.name, &d.name)) {
-                    out.push(Violation::Upward {
-                        krate: c.name.clone(),
-                        dep: d.name.clone(),
-                        from: layer,
-                        to: if to == u8::MAX { 7 } else { to },
-                        kind: d.kind,
-                    });
-                }
-            } else if layer < UI_MIN_LAYER && is_ui_crate(&d.name) {
-                out.push(Violation::UiBelowL6 { krate: c.name.clone(), dep: d.name.clone(), layer });
-            }
-        }
-    }
-    out.sort_by_key(ToString::to_string);
-    out.dedup();
-    out
 }
 
 /// Build the model from `cargo metadata --format-version 1 --no-deps`.
@@ -215,117 +99,93 @@ pub fn describe(class: Option<Class>) -> String {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn c(name: &str, deps: &[(&str, DepKind, bool)]) -> Crate {
-        Crate { name: name.into(), deps: deps.iter().map(|(n, k, w)| Dep { name: (*n).into(), kind: *k, workspace: *w }).collect() }
+pub fn config() -> Config {
+    let full = |name: &str| if matches!(name, "gridcraft" | "xtask") { name.to_owned() } else { format!("gridcraft-{name}") };
+    let mut config = Config { root: crate::root(), ..Config::default() };
+    for layer in 0..=7 {
+        config
+            .layers
+            .push((format!("L{layer}"), TABLE.iter().filter(|(_, class)| *class == Class::Layer(layer)).map(|(name, _)| full(name)).collect()));
     }
-    use DepKind::*;
-
-    #[test]
-    fn clean_downward_graph_passes() {
-        let g = [
-            c("gridcraft-core", &[("serde", Normal, false)]),
-            c("gridcraft-numfmt", &[("gridcraft-core", Normal, true)]),
-            c("gridcraft-formula", &[("gridcraft-core", Normal, true)]),
-            c("gridcraft-functions", &[("gridcraft-core", Normal, true), ("gridcraft-formula", Normal, true)]),
-            c("gridcraft-model", &[("gridcraft-formula", Normal, true)]),
-            c("gridcraft-calc", &[("gridcraft-model", Normal, true), ("gridcraft-functions", Normal, true), ("gridcraft-numfmt", Normal, true)]),
-            c("gridcraft-xlsx", &[("gridcraft-core", Normal, true), ("gridcraft-formula", Normal, true), ("gridcraft-model", Normal, true)]),
-            c("gridcraft-chart", &[("gridcraft-model", Normal, true)]),
-            c("gridcraft-engine", &[("gridcraft-calc", Normal, true), ("gridcraft-xlsx", Normal, true), ("gridcraft-chart", Normal, true)]),
-            c("gridcraft-ui-egui", &[("gridcraft-engine", Normal, true), ("egui", Normal, false), ("wgpu", Normal, false)]),
-            c("gridcraft-cli", &[("gridcraft-ui-egui", Normal, true), ("gridcraft-mcp", Normal, true)]),
-        ];
-        assert!(check(&g).is_empty(), "{:?}", check(&g));
-    }
-
-    #[test]
-    fn upward_dependency_flagged() {
-        let v = check(&[c("gridcraft-formula", &[("gridcraft-engine", Normal, true)])]);
-        assert!(matches!(v[..], [Violation::Upward { from: 1, to: 5, .. }]));
-    }
-
-    #[test]
-    fn sideways_dependency_flagged() {
-        let v = check(&[c("gridcraft-xlsx", &[("gridcraft-calc", Normal, true)])]);
-        assert!(v.iter().any(|x| matches!(x, Violation::Upward { from: 2, to: 2, .. })), "{v:?}");
-        let v = check(&[c("gridcraft-ui-egui", &[("gridcraft-mcp", Normal, true)])]);
-        assert!(matches!(v[..], [Violation::Upward { from: 6, to: 6, .. }]));
-    }
-
-    #[test]
-    fn intra_layer_chains_allowed_one_way() {
-        assert!(check(&[c("gridcraft-numfmt", &[("gridcraft-core", Normal, true)])]).is_empty());
-        let v = check(&[c("gridcraft-core", &[("gridcraft-numfmt", Normal, true)])]);
-        assert!(matches!(v[..], [Violation::Upward { from: 0, to: 0, .. }]));
-        assert!(check(&[c("gridcraft-calc", &[("gridcraft-model", Normal, true)])]).is_empty());
-        assert!(!check(&[c("gridcraft-model", &[("gridcraft-calc", Normal, true)])]).is_empty());
-        assert!(!check(&[c("gridcraft-calc", &[("gridcraft-xlsx", Normal, true)])]).is_empty());
-    }
-
-    #[test]
-    fn format_crate_limited_to_core_formula_model() {
-        let v = check(&[c("gridcraft-xlsx", &[("gridcraft-numfmt", Normal, true)])]);
-        assert!(matches!(&v[..], [Violation::FormatDep { dep, .. }] if dep == "gridcraft-numfmt"), "{v:?}");
-        // Dev-dependencies (round-trip tests through the calculator, say) are allowed if lower.
-        assert!(check(&[c("gridcraft-xlsx", &[("gridcraft-numfmt", Dev, true)])]).is_empty());
-    }
-
-    #[test]
-    fn self_dev_dependency_ignored() {
-        assert!(check(&[c("gridcraft-model", &[("gridcraft-model", Dev, true)])]).is_empty());
-    }
-
-    #[test]
-    fn upward_dev_dependency_flagged() {
-        let v = check(&[c("gridcraft-core", &[("gridcraft-model", Dev, true)])]);
-        assert!(matches!(v[..], [Violation::Upward { kind: Dev, .. }]));
-    }
-
-    #[test]
-    fn ui_crates_below_l6_flagged() {
-        for dep in ["egui", "eframe", "winit", "egui_kittest", "egui_extras", "rfd", "wgpu", "wgpu-core"] {
-            let v = check(&[c("gridcraft-engine", &[(dep, Normal, false)])]);
-            assert!(matches!(v[..], [Violation::UiBelowL6 { layer: 5, .. }]), "{dep}");
-        }
-        assert!(check(&[c("gridcraft-engine", &[("serde", Normal, false)])]).is_empty());
-        assert!(check(&[c("gridcraft-mcp", &[("winit", Normal, false)])]).is_empty());
-    }
-
-    #[test]
-    fn unregistered_crate_is_error() {
-        let v = check(&[c("gridcraft-mystery", &[])]);
-        assert!(matches!(&v[..], [Violation::Unregistered { krate }] if krate == "gridcraft-mystery"));
-        assert!(v[0].to_string().contains("register"));
-    }
-
-    #[test]
-    fn apps_and_xtask_exempt() {
-        for app in ["gridcraft", "gridcraft-cli", "gridcraft-web", "xtask"] {
-            assert!(check(&[c(app, &[("egui", Normal, false), ("gridcraft-ui-egui", Normal, true)])]).is_empty());
+    config.exempt = TABLE.iter().filter(|(_, class)| matches!(class, Class::Exempt | Class::Layer(7))).map(|(name, _)| full(name)).collect();
+    for chain in INTRA_LAYER_ORDER {
+        for (index, from) in chain.iter().enumerate() {
+            for to in &chain[..index] {
+                config.allowed_edges.push((full(from), full(to)));
+            }
         }
     }
+    config.external_rules.push(ExternalRule {
+        dependencies: UI_CRATES.iter().map(|name| (*name).into()).collect(),
+        allowed_from: TABLE
+            .iter()
+            .filter(|(_, class)| matches!(class, Class::Layer(layer) if *layer >= UI_MIN_LAYER))
+            .map(|(name, _)| full(name))
+            .collect(),
+        allowed_dev_from: Vec::new(),
+    });
+    config.workspace_rules = FORMAT_ALLOWED
+        .iter()
+        .map(|(name, allowed)| WorkspaceRule { from: full(name), allowed: allowed.iter().map(|name| full(name)).collect(), allow_dev: true })
+        .collect();
+    config
+}
 
-    #[test]
-    fn metadata_parsing() {
-        let meta: Value = serde_json::from_str(
-            r#"{"packages":[
-                {"name":"gridcraft-model","dependencies":[
-                    {"name":"gridcraft-core","kind":null,"path":"/x/crates/core"},
-                    {"name":"serde","kind":null},
-                    {"name":"proptest","kind":"dev"}]},
-                {"name":"gridcraft-core","dependencies":[]}
-            ]}"#,
-        )
-        .unwrap();
-        let g = from_metadata(&meta).unwrap();
-        assert_eq!(g.len(), 2);
-        let model = g.iter().find(|c| c.name == "gridcraft-model").unwrap();
-        assert!(model.deps[0].workspace && !model.deps[1].workspace);
-        assert_eq!(model.deps[2].kind, Dev);
-        assert!(check(&g).is_empty());
+fn diagnostic(message: String) -> Option<String> {
+    if let Some(name) = message.strip_suffix(": unregistered workspace crate") {
+        return Some(format!("{name}: unknown workspace crate; register it in xtask/src/layers.rs TABLE (see plan/architecture.md §3)"));
     }
+    let Some((source, rest)) = message.split_once(" -> ") else { return Some(message) };
+    let Some((target, rule)) = rest.split_once(": ") else { return Some(message) };
+    let (target, kind) = target.split_once(" [").map_or((target, ""), |(target, kind)| (target, kind.trim_end_matches(']')));
+    let level = |name| match classify(name) {
+        Some(Class::Layer(layer)) => layer,
+        _ => 7,
+    };
+    Some(match rule {
+        "forbidden external dependency" => {
+            format!("{source} (L{}) depends on UI crate `{target}`; UI toolkits are only allowed in L6+", level(source))
+        }
+        "workspace dependency allowlist" => format!("{source}: format crates may only depend on core/formula/model, not {target}"),
+        "disallowed layer edge" => {
+            classify(target)?;
+            format!("{source} (L{}) -> {target} (L{}) [{kind}]: may only depend on strictly lower layers", level(source), level(target))
+        }
+        _ => message,
+    })
+}
+
+pub fn report(crates: &[Crate]) -> Result<(String, usize), String> {
+    let mut violations: Vec<_> = craft_xtask::layers::check(&config(), crates)?.into_iter().filter_map(diagnostic).collect();
+    violations.sort();
+    violations.dedup();
+    let mut output = String::from("Dependency layering (AGENTS.md \"Layering\")\n\n");
+    writeln!(output, "{:<28} {:<10} workspace deps", "crate", "layer").map_err(|error| error.to_string())?;
+    for krate in crates {
+        let dependencies: Vec<_> = krate
+            .deps
+            .iter()
+            .filter(|dep| dep.workspace)
+            .map(|dep| {
+                let kind = match dep.kind {
+                    DepKind::Normal => "",
+                    DepKind::Dev => " (dev)",
+                    DepKind::Build => " (build)",
+                };
+                format!("{}{kind}", short_name(&dep.name))
+            })
+            .collect();
+        writeln!(output, "{:<28} {:<10} {}", krate.name, describe(classify(&krate.name)), dependencies.join(", "))
+            .map_err(|error| error.to_string())?;
+    }
+    output.push('\n');
+    if violations.is_empty() {
+        writeln!(output, "OK: {} crates, no layering violations.", crates.len()).map_err(|error| error.to_string())?;
+    } else {
+        writeln!(output, "{} violation(s):", violations.len()).map_err(|error| error.to_string())?;
+        for violation in &violations {
+            writeln!(output, "  - {violation}").map_err(|error| error.to_string())?;
+        }
+    }
+    Ok((output, violations.len()))
 }

@@ -18,3 +18,5 @@ engine = ["dep:gridcraft-engine"]
 [dependencies]
 serde_json = { workspace = true }
 gridcraft-engine = { workspace = true, optional = true }
+# TODO: repoint to storytold/craft-libs after upstream merge
+craft-xtask = { git = "https://github.com/cloudbring/craft-libs", branch = "algo/integration" }

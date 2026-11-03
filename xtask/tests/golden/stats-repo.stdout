@@ -1,0 +1,23 @@
+crate                       files    lines #[test]  proptest!
+--------------------------------------------------------------
+gridcraft                      10     2515      37          0
+gridcraft-calc                 13     6560      97          0
+gridcraft-chart                16     4725      45          0
+gridcraft-cli                  10     2784      36          0
+gridcraft-core                  6     2027      38          0
+gridcraft-engine              153    63052     900          0
+gridcraft-formula              11     2993      43          0
+gridcraft-functions            32    16982     156          0
+gridcraft-math                  3     1709      28          0
+gridcraft-mcp                   7     1972      25          0
+gridcraft-model                15     5482      35          0
+gridcraft-numfmt                7     3166      39          0
+gridcraft-pdf                   4     1657      19          0
+gridcraft-ui-egui             250    77504    1397          0
+gridcraft-web                   4      854       4          0
+gridcraft-xlsx                 80    29664     320          0
+xtask                           9     1884      34          0
+--------------------------------------------------------------
+TOTAL                         630   225530    3253          0
+
+(#[test] counts source attributes; macro-generated tests count once. Use --exact for harness counts.)

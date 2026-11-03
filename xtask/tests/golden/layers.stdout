@@ -1,0 +1,22 @@
+Dependency layering (AGENTS.md "Layering")
+
+crate                        layer      workspace deps
+gridcraft                    L7 app     engine, ui-egui, mcp
+gridcraft-calc               L2         core, formula, functions, model, numfmt
+gridcraft-chart              L3         calc, core, model, numfmt
+gridcraft-cli                L7 app     engine, mcp
+gridcraft-core               L0         
+gridcraft-engine             L5         calc, chart, core, formula, functions, math, model, numfmt, pdf, xlsx, xlsx (dev)
+gridcraft-formula            L1         core
+gridcraft-functions          L1         core
+gridcraft-math               L1         
+gridcraft-mcp                L6         engine
+gridcraft-model              L2         core, formula, math
+gridcraft-numfmt             L0         core
+gridcraft-pdf                L0         
+gridcraft-ui-egui            L6         chart, engine, xlsx (dev)
+gridcraft-web                L7 app     engine, ui-egui
+gridcraft-xlsx               L2         core, formula, math, model, functions (dev)
+xtask                        unchecked  engine
+
+OK: 17 crates, no layering violations.

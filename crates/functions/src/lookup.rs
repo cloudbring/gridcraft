@@ -40,10 +40,52 @@ fn same_type(a: &Value, b: &Value) -> bool {
     matches!((a, b), (Value::Number(_), Value::Number(_)) | (Value::Text(_), Value::Text(_)) | (Value::Bool(_), Value::Bool(_)))
 }
 
+/// A searched 1-D sequence of values: a slice, or a borrowed row or column of an array
+/// ([`Line`]). A missing entry reads as blank, exactly like the `Value::Empty` a copied key
+/// vector held: no lookup needle is ever blank ([`needle`]) and blank matches no type.
+trait Hay {
+    /// Number of entries.
+    fn len(&self) -> usize;
+    /// The entry at `i`, `None` past the sequence or past the data of a short array.
+    fn at(&self, i: usize) -> Option<&Value>;
+}
+
+impl Hay for [Value] {
+    fn len(&self) -> usize {
+        <[Value]>::len(self)
+    }
+    fn at(&self, i: usize) -> Option<&Value> {
+        self.get(i)
+    }
+}
+
+/// The first column or first row of an array, borrowed: the key line VLOOKUP and HLOOKUP search
+/// without cloning it into a `Vec`.
+enum Line<'a> {
+    Column(&'a Array),
+    Row(&'a Array),
+}
+
+impl Hay for Line<'_> {
+    fn len(&self) -> usize {
+        match self {
+            Line::Column(a) => a.rows,
+            Line::Row(a) => a.cols,
+        }
+    }
+    fn at(&self, i: usize) -> Option<&Value> {
+        match self {
+            Line::Column(a) => a.get(i, 0),
+            Line::Row(a) => a.get(0, i),
+        }
+    }
+}
+
 /// Exact search (first match, or last when `reverse`). Text needles match wildcards when `wild`.
-fn find_exact(x: &Value, hay: &[Value], wild: bool, reverse: bool) -> Option<usize> {
+fn find_exact<H: Hay + ?Sized>(x: &Value, hay: &H, wild: bool, reverse: bool) -> Option<usize> {
     let wild = wild && matches!(x, Value::Text(t) if has_wildcards(t));
-    if reverse { hay.iter().rposition(|v| lookup_equal(x, v, wild)) } else { hay.iter().position(|v| lookup_equal(x, v, wild)) }
+    let hit = |i: usize| hay.at(i).is_some_and(|v| lookup_equal(x, v, wild));
+    if reverse { (0..hay.len()).rev().find(|&i| hit(i)) } else { (0..hay.len()).find(|&i| hit(i)) }
 }
 
 /// Approximate match of VLOOKUP, HLOOKUP, LOOKUP and MATCH: the position of the largest entry
@@ -61,21 +103,21 @@ fn find_exact(x: &Value, hay: &[Value], wild: bool, reverse: bool) -> Option<usi
 /// `HLOOKUP("STRING", {"INTEGRAL","DOUBLE","BLANK","STRING","REF","AREA (rows)",<blank>}, …)`
 /// finds "STRING" and `LOOKUP("DOUBLE", {"DOUBLE","BLANK","STRING","REF","AREA (rows)"}, …)`
 /// finds "DOUBLE". Work is linear in the vector length at worst.
-fn bsearch_last(x: &Value, hay: &[Value], desc: bool) -> Option<usize> {
+fn bsearch_last<H: Hay + ?Sized>(x: &Value, hay: &H, desc: bool) -> Option<usize> {
     let mut hi = hay.len().checked_sub(1)?;
     let mut lo = 0usize;
     let mut best = None;
     while lo <= hi {
         let mid = lo + (hi - lo) / 2;
-        let Some(j) = (lo..=mid).rev().find(|&j| hay.get(j).is_some_and(|v| same_type(x, v))) else {
+        let Some(j) = (lo..=mid).rev().find(|&j| hay.at(j).is_some_and(|v| same_type(x, v))) else {
             lo = mid + 1;
             continue;
         };
-        let v = hay.get(j)?;
+        let v = hay.at(j)?;
         let o = lookup_order(v, x);
         if o == Ordering::Equal {
             let mut k = j;
-            while hay.get(k + 1).is_some_and(|w| same_type(x, w) && lookup_order(w, x) == Ordering::Equal) {
+            while hay.at(k + 1).is_some_and(|w| same_type(x, w) && lookup_order(w, x) == Ordering::Equal) {
                 k += 1;
             }
             return Some(k);
@@ -153,7 +195,7 @@ fn vh_lookup(args: &[Arg], vertical: bool) -> R<Value> {
     }
     let idx = (idx.trunc() as usize).saturating_sub(1);
     let approx = opt_bool(args, 3, true)?;
-    let (keys, len) = if vertical { (column(&table, 0), table.cols) } else { (row(&table, 0), table.rows) };
+    let (keys, len) = if vertical { (Line::Column(&table), table.cols) } else { (Line::Row(&table), table.rows) };
     if idx >= len {
         return Err(CellError::Ref);
     }
@@ -180,7 +222,7 @@ fn lookup(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let la = as_array(lv);
     if args.len() >= 3 {
         let keys = if la.rows == 1 || la.cols == 1 { la.data.clone() } else { column(&la, 0) };
-        let pos = bsearch_last(&x, &keys, false).ok_or(CellError::NA)?;
+        let pos = bsearch_last(&x, keys.as_slice(), false).ok_or(CellError::NA)?;
         let rv = &arg(args, 2)?.value;
         if let Value::Error(e) = rv {
             return Err(*e);
@@ -199,11 +241,11 @@ fn lookup(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     // matching entry from the last row / column.
     if la.cols > la.rows {
         let keys = row(&la, 0);
-        let pos = bsearch_last(&x, &keys, false).ok_or(CellError::NA)?;
+        let pos = bsearch_last(&x, keys.as_slice(), false).ok_or(CellError::NA)?;
         Ok(cell_result(la.get(la.rows - 1, pos).cloned().unwrap_or(Value::Empty)))
     } else {
         let keys = column(&la, 0);
-        let pos = bsearch_last(&x, &keys, false).ok_or(CellError::NA)?;
+        let pos = bsearch_last(&x, keys.as_slice(), false).ok_or(CellError::NA)?;
         Ok(cell_result(la.get(pos, la.cols - 1).cloned().unwrap_or(Value::Empty)))
     }
 }
@@ -217,11 +259,11 @@ fn match_fn(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let hay = vector(&as_array(av)).ok_or(CellError::NA)?;
     let mt = opt_num(args, 2, 1.0)?;
     let pos = if mt == 0.0 {
-        find_exact(&x, &hay, true, false)
+        find_exact(&x, hay.as_slice(), true, false)
     } else if mt > 0.0 {
-        bsearch_last(&x, &hay, false)
+        bsearch_last(&x, hay.as_slice(), false)
     } else {
-        bsearch_last(&x, &hay, true)
+        bsearch_last(&x, hay.as_slice(), true)
     };
     pos.map(|p| Value::Number((p + 1) as f64)).ok_or(CellError::NA)
 }
@@ -628,6 +670,61 @@ mod tests {
         let mixed = arr(vec![vec![nv(1.0), tv("x"), nv(3.0), tv("y")]]);
         close(ev("LOOKUP", vec![n(9.0), av(mixed.clone()), av(row(&[1.0, 2.0, 3.0, 4.0]))]), 3.0);
         close(ev("LOOKUP", vec![t("zz"), av(mixed), av(row(&[1.0, 2.0, 3.0, 4.0]))]), 4.0);
+    }
+
+    /// #56: VLOOKUP and HLOOKUP search a borrowed view of the first column/row. Over seeded
+    /// mixed-type tables (unsorted runs, duplicates, blanks) and every kind of needle, the view
+    /// must answer exactly what the copied key vector answered (the position drives the result:
+    /// #N/A when none, blank read as 0 like a reference to an empty cell).
+    #[test]
+    fn borrowed_key_line_matches_copied_keys() {
+        let mut state = 0x0DDB_1A5E_5BAD_5EED_u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state >> 11
+        };
+        let val = |r: u64| match r % 6 {
+            0 => Value::Number((r % 9) as f64),
+            1 => Value::Number(f64::from_bits(r % 5) * 0.0),
+            2 => Value::from(if r.is_multiple_of(2) { "a" } else { "B" }),
+            3 => Value::Bool(r.is_multiple_of(2)),
+            4 => Value::Empty,
+            _ => Value::from("abc"),
+        };
+        for it in 0..400u64 {
+            let vertical = next() % 2 == 0;
+            let rows = 2 + (next() % 8) as usize;
+            let cols = 2 + (next() % 3) as usize;
+            let grid: Vec<Vec<Value>> = (0..rows).map(|_| (0..cols).map(|_| val(next())).collect()).collect();
+            let table = arr(grid.clone());
+            // The needle: any generated value, or a wildcard text, with blanks read as 0.
+            let raw = if it % 5 == 0 { Value::from(["a*", "B?", "*", "a?"][((next() % 4) as usize).min(3)]) } else { val(next()) };
+            let x = if matches!(raw, Value::Empty) { Value::Number(0.0) } else { raw };
+            for approx in [true, false] {
+                let keys: Vec<Value> = if vertical {
+                    (0..rows).map(|r| grid[r].first().cloned().unwrap_or(Value::Empty)).collect()
+                } else {
+                    grid.first().cloned().unwrap_or_default()
+                };
+                let want_pos =
+                    if approx { super::bsearch_last(&x, keys.as_slice(), false) } else { super::find_exact(&x, keys.as_slice(), true, false) };
+                let name = if vertical { "VLOOKUP" } else { "HLOOKUP" };
+                let got = ev(name, vec![av(x.clone()), rf(table.clone()), n(2.0), b(approx)]);
+                match want_pos {
+                    None => assert_eq!(got, Value::Error(CellError::NA), "it={it} {name} approx={approx} x={x:?}"),
+                    Some(pos) => {
+                        let cell = if vertical { grid[pos].get(1) } else { grid.get(1).and_then(|r| r.get(pos)) };
+                        let want = match cell.cloned().unwrap_or(Value::Empty) {
+                            Value::Empty => Value::Number(0.0),
+                            v => v,
+                        };
+                        assert_eq!(got, want, "it={it} {name} approx={approx} x={x:?} pos={pos}");
+                    }
+                }
+            }
+        }
     }
 
     /// Approximate matches over unsorted, mixed-type data as observed in Excel

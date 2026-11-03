@@ -1306,50 +1306,14 @@ fn z_test(s: &Session, p: &Json) -> Result<Grid> {
 
 // ---------------------------------------------------------------- fourier analysis
 
-/// Radix-2 fast Fourier transform (iterative Cooley–Tukey) in place, for a power-of-two number of
-/// complex values (re, im). The forward transform is unscaled, X[k] = Σ x[n]·e^(−2πikn/N); the
-/// inverse uses e^(+2πikn/N) and divides by N, so it returns the values the forward one took.
-fn fft(a: &mut [(f64, f64)], inverse: bool) {
-    let n = a.len();
-    if n < 2 || !n.is_power_of_two() {
-        return;
-    }
-    let bits = n.trailing_zeros();
-    for i in 0..n {
-        let j = i.reverse_bits() >> (usize::BITS - bits);
-        if i < j {
-            a.swap(i, j);
-        }
-    }
-    let sign = if inverse { 1.0 } else { -1.0 };
-    let mut len = 2;
-    while len <= n {
-        let ang = sign * 2.0 * std::f64::consts::PI / len as f64;
-        // One twiddle table per stage: every butterfly of the stage reuses the same len/2
-        // factors, so the table replaces the per-butterfly sin/cos. Each factor is still
-        // computed directly, not by repeated multiplication, and the total over all stages is
-        // O(n) factors (n − 2) against the O(n log n) of the per-butterfly form.
-        let twiddles: Vec<(f64, f64)> = (0..len / 2).map(|k| ((ang * k as f64).cos(), (ang * k as f64).sin())).collect();
-        for start in (0..n).step_by(len) {
-            for (k, &(wr, wi)) in twiddles.iter().enumerate() {
-                let (i, j) = (start + k, start + k + len / 2);
-                let (Some(&(ur, ui)), Some(&(xr, xi))) = (a.get(i), a.get(j)) else { continue };
-                let (vr, vi) = (xr * wr - xi * wi, xr * wi + xi * wr);
-                if let Some(u) = a.get_mut(i) {
-                    *u = (ur + vr, ui + vi);
-                }
-                if let Some(x) = a.get_mut(j) {
-                    *x = (ur - vr, ui - vi);
-                }
-            }
-        }
-        len <<= 1;
-    }
-    if inverse {
-        let nf = n as f64;
-        a.iter_mut().for_each(|v| *v = (v.0 / nf, v.1 / nf));
-    }
+fn complex_fft(values: &mut [craft_fft::Complex<f64>], inverse: bool) -> std::result::Result<(), craft_fft::Error> {
+    let direction = if inverse { craft_fft::Direction::Inverse } else { craft_fft::Direction::Forward };
+    let mut plan = craft_fft::ComplexFft::<f64>::new(values.len())?;
+    plan.process_in_place(direction, values)
 }
+
+#[cfg(test)]
+use fourier_tests::fft;
 
 /// Fourier Analysis: the discrete Fourier transform (or with `inverse` its inverse) of one row or
 /// column of 2^k values, read and written as complex numbers the way IMREAL, IMAGINARY and
@@ -1365,13 +1329,13 @@ fn fourier_analysis(s: &Session, p: &Json) -> Result<Grid> {
         let part = |f: &str| call(f, std::slice::from_ref(x)).as_f64();
         match (x, part("IMREAL"), part("IMAGINARY")) {
             (Value::Empty, ..) => return Err(non_numeric()),
-            (_, Some(re), Some(im)) => a.push((re, im)),
+            (_, Some(re), Some(im)) => a.push(craft_fft::Complex::new(re, im)),
             _ => return Err(EngineError::Other("Input range must hold numbers or complex numbers such as 3+4i.".into())),
         }
     }
-    let total: f64 = a.iter().map(|(re, im)| re.abs() + im.abs()).sum();
+    let total: f64 = a.iter().map(|value| value.re.abs() + value.im.abs()).sum();
     let inverse = flag(p, "inverse");
-    fft(&mut a, inverse);
+    complex_fft(&mut a, inverse).map_err(|error| EngineError::Other(format!("Fourier Analysis: {error}")))?;
     // Parts that can only be rounding noise of the transform are written as 0. Each of the
     // log2(N) butterfly stages adds at most a few units of f64::EPSILON times the magnitude of
     // the values it combines, so the computed transform differs from the exact one by at most
@@ -1393,8 +1357,8 @@ fn fourier_analysis(s: &Session, p: &Json) -> Result<Grid> {
     if first == 1 {
         g.txt(0, 0, &v.name);
     }
-    for (i, (re, im)) in a.into_iter().enumerate() {
-        g.put(first + idx(i), 0, callf("COMPLEX", &[clean(re), clean(im)]));
+    for (i, value) in a.into_iter().enumerate() {
+        g.put(first + idx(i), 0, callf("COMPLEX", &[clean(value.re), clean(value.im)]));
     }
     Ok(g)
 }
@@ -1883,6 +1847,10 @@ fn run(s: &mut Session, p: &Json) -> Result<Json> {
     }
     Ok(out)
 }
+
+#[cfg(test)]
+#[path = "analysis/fourier_tests.rs"]
+mod fourier_tests;
 
 #[cfg(test)]
 mod tests {

@@ -1,6 +1,6 @@
 # Architecture
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-11-02 · **Change:** minor (Python mode in the formula bar; earlier: Python cells as data; earlier: equations: the `math` crate and the layout cache; earlier: recently used functions kept in the preferences; Function Library module; accent icons; earlier: the hidden names that hold macros) · **Target:** Microsoft Excel (Microsoft 365)
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-11-03 · **Change:** minor (shared Fourier kernel; earlier: Python mode in the formula bar; Python cells as data; equations: the `math` crate and the layout cache; recently used functions; Function Library module; accent icons; hidden macro names) · **Target:** Microsoft Excel (Microsoft 365)
 
 How GridCraft is built today. Rules for contributors are in [`AGENTS.md`](../AGENTS.md).
 
@@ -91,6 +91,54 @@ drawing its own:
   the Windows UI font's row is 17.28 px), so every counted line fits whatever the font;
   `formula_bar::BarLayout` records where its parts went each frame, for tests.
 
+
+## Fourier analysis
+
+The Analysis ToolPak command uses `craft_fft::ComplexFft<f64>` for its unscaled forward and
+1/N-scaled inverse transforms. Each report owns its plan and scratch; there is no global cache.
+The engine still accepts only power-of-two lengths from 1 through `MAX_FOURIER` (4096), even
+though the shared kernel supports other lengths. Input validation, labels, input-derived noise
+cleanup and `COMPLEX`'s 15-significant-digit complex-text cell formatting are unchanged.
+
+The dependency temporarily follows `cloudbring/craft-libs`'s `algo/1-craft-fft` branch, with the
+exact revision in `Cargo.lock`; repoint it to `storytold/craft-libs` after algorithms epic #1 merges.
+The #23 DFT, Parseval and round-trip tests remain unchanged. A test-only copy of #23's stage-wise
+kernel checks random complex inputs at every supported power of two in both directions, at
+three scales, within 1e-9 relative error per complex bin. Command fixtures retain exact string
+assertions, and boundary tests cover invalid sizes and the maximum accepted input.
+
+Run the end-to-end release benchmark (100 samples per direction, workbook setup excluded;
+command execution includes planning, parsing, formatting, cell writes and history) with:
+
+```sh
+cargo test -p gridcraft-engine --release fourier_command_benchmark -- --ignored --nocapture --test-threads=1
+```
+
+On 2026-11-03, rustup stable on aarch64 macOS, the unchanged #23 release binary and the migrated
+binary were alternated for three runs of 100 samples per direction at 4096 seeded complex inputs.
+The median of each binary's three run medians was:
+
+| Measurement | #23 | `craft-fft` |
+|---|---:|---:|
+| Forward command | 8.752 ms | 8.457 ms |
+| Inverse command | 8.989 ms | 9.719 ms |
+| Forward kernel, including planning | 38.208 µs | 38.125 µs |
+| Inverse kernel, including planning | 47.625 µs | 55.917 µs |
+
+Command run medians varied from 6.902 to 10.725 ms, so these measurements do not establish an
+end-to-end speedup. Planning is included; these are not cached-plan throughput measurements.
+The differential check compared 1,572,672 complex bins, with maximum relative error 1.16e-11.
+All 905 engine tests passed (the manual benchmark is ignored by default). Engine/workspace clippy,
+formatting, engine/full wasm checks, doctests, assets, layers, parity and keytips passed.
+Full `cargo xtask ci` still encounters the three UI failures already noted on #23: missing glyphs
+in `interaction::column_autocomplete_folds_case_beyond_ascii` and
+`interaction::language_switch_renders_the_ribbon_and_persists`, and the tooltip assertion in
+`ribbon_layout::big_split_button_separates_the_default_action_from_the_menu`. They are outside
+this migration; the gates skipped after that test failure were run separately. A full workspace
+test rerun excluding exactly those three cases passed 3,248 tests, with two intentional ignores.
+
+`cargo xtask parity` measures registered-command breadth, not numeric Excel conformance; this
+kernel migration does not change the catalog or relax the existing Fourier size restrictions.
 
 ## Engine building blocks for multi-command actions
 
@@ -236,6 +284,7 @@ rpm, tarball), FreeBSD, and web (WASM; WebGPU or WebGL2). Release workflows in
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-11-03 | minor | Fourier Analysis uses `craft-fft` (#1, supersedes #23), preserving size limits and cell formatting; differential tests and a full-command benchmark |
 | 2026-11-02 | minor | Python mode in the formula bar: Python mode on the shared editor, `code_field` and its stop keys; drafts follow their sheet by `model::SheetUid` |
 | 2026-11-02 | minor | Python cells as data: `model::PyCode`, the file forms, calc laying out kept results, the limits on open, and what copying, filling and sorting do to `xl()` references; edits that would push code past the limit are refused |
 | 2026-11-01 | trivial | Equations: the layout cache answers for a source over the cap by its length alone, without hashing it |

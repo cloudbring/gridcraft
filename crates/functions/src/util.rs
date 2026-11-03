@@ -24,7 +24,7 @@ pub(crate) const A: &[bool] = &[false];
 pub(crate) fn finish(r: R<Value>) -> Value {
     match r {
         Ok(Value::Number(n)) => Value::number(n),
-        Ok(Value::Text(t)) if t.len() > MAX_TEXT && t.chars().count() > MAX_TEXT => Value::Error(CellError::Value),
+        Ok(Value::Text(t)) if t.len() > MAX_TEXT && t.encode_utf16().count() > MAX_TEXT => Value::Error(CellError::Value),
         Ok(v) => v,
         Err(e) => Value::Error(e),
     }

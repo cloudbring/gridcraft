@@ -19,8 +19,28 @@ fn chars(s: &str) -> Vec<char> {
     s.chars().collect()
 }
 
+/// Cutting inside a surrogate pair yields U+FFFD, matching the XLSX UTF-16 decoder.
+/// This lossy edge case differs from Excel because the engine stores valid UTF-8.
+struct Utf16Text(Vec<u16>);
+
+impl Utf16Text {
+    fn new(text: &str) -> Self {
+        Self(text.encode_utf16().collect())
+    }
+
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    fn slice(&self, start: usize, end: usize) -> String {
+        let start = start.min(self.len());
+        let end = end.min(self.len()).max(start);
+        String::from_utf16_lossy(&self.0[start..end])
+    }
+}
+
 fn check_len(s: String) -> R<Value> {
-    if s.len() > MAX_TEXT && s.chars().count() > MAX_TEXT {
+    if s.len() > MAX_TEXT && s.encode_utf16().count() > MAX_TEXT {
         return Err(CellError::Value);
     }
     text_val(s)
@@ -87,13 +107,13 @@ fn count_arg(a: &[Arg], i: usize, default: f64) -> R<usize> {
 fn left(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let s = text(a, 0)?;
     let n = count_arg(a, 1, 1.0)?;
-    text_val(s.chars().take(n).collect::<String>())
+    text_val(Utf16Text::new(&s).slice(0, n))
 }
 
 fn right(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
-    let s = chars(&text(a, 0)?);
+    let s = Utf16Text::new(&text(a, 0)?);
     let n = count_arg(a, 1, 1.0)?.min(s.len());
-    text_val(s[s.len() - n..].iter().collect::<String>())
+    text_val(s.slice(s.len() - n, s.len()))
 }
 
 fn mid(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
@@ -104,10 +124,35 @@ fn mid(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     }
     let n = count_arg(a, 2, 0.0)?;
     let start = if start > 1e9 { 1_000_000_000 } else { start as usize };
-    text_val(s.chars().skip(start - 1).take(n).collect::<String>())
+    text_val(Utf16Text::new(&s).slice(start - 1, (start - 1).saturating_add(n)))
 }
 
 fn len(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    num_val(Utf16Text::new(&text(a, 0)?).len() as f64)
+}
+
+fn leftb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    text_val(text(a, 0)?.chars().take(count_arg(a, 1, 1.0)?).collect::<String>())
+}
+
+fn rightb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    let s = chars(&text(a, 0)?);
+    let n = count_arg(a, 1, 1.0)?.min(s.len());
+    text_val(s[s.len() - n..].iter().collect::<String>())
+}
+
+fn midb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    let s = text(a, 0)?;
+    let start = num(a, 1)?;
+    if start.is_nan() || start < 1.0 {
+        return Err(CellError::Value);
+    }
+    let n = count_arg(a, 2, 0.0)?;
+    let start = if start > 1e9 { 1_000_000_000 } else { start as usize };
+    text_val(s.chars().skip(start - 1).take(n).collect::<String>())
+}
+
+fn lenb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     num_val(text(a, 0)?.chars().count() as f64)
 }
 
@@ -200,6 +245,22 @@ fn substitute(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
 }
 
 fn replace(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    let s = Utf16Text::new(&text(a, 0)?);
+    let start = num(a, 1)?;
+    if start.is_nan() || start < 1.0 {
+        return Err(CellError::Value);
+    }
+    let n = count_arg(a, 2, 0.0)?;
+    let new = text(a, 3)?;
+    let start = (if start > 1e9 { 1_000_000_000 } else { start as usize } - 1).min(s.len());
+    let end = start.saturating_add(n).min(s.len());
+    let mut out = s.0[..start].to_vec();
+    out.extend(new.encode_utf16());
+    out.extend_from_slice(&s.0[end..]);
+    check_len(String::from_utf16_lossy(&out))
+}
+
+fn replaceb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let s = chars(&text(a, 0)?);
     let start = num(a, 1)?;
     if start.is_nan() || start < 1.0 {
@@ -222,7 +283,7 @@ fn rept(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
         return Err(CellError::Value);
     }
     let n = n.trunc();
-    let total = s.chars().count() as f64 * n;
+    let total = Utf16Text::new(&s).len() as f64 * n;
     if total > MAX_TEXT as f64 {
         return Err(CellError::Value);
     }
@@ -233,7 +294,7 @@ fn find_impl(a: &[Arg], wild: bool) -> R<Value> {
     let needle = text(a, 0)?;
     let hay = text(a, 1)?;
     let start = opt_num(a, 2, 1.0)?;
-    let hc = chars(&hay);
+    let hc = Utf16Text::new(&hay);
     if (start.is_nan() || start < 1.0) || start > hc.len().max(1) as f64 {
         return Err(CellError::Value);
     }
@@ -242,10 +303,19 @@ fn find_impl(a: &[Arg], wild: bool) -> R<Value> {
         return num_val((start + 1) as f64);
     }
     let pos = if wild {
-        wildcard_find(&needle, &hay, start)
+        let scalar_start = hay
+            .chars()
+            .scan(0usize, |offset, ch| {
+                let previous = *offset;
+                *offset += ch.len_utf16();
+                Some(previous)
+            })
+            .take_while(|offset| *offset < start)
+            .count();
+        wildcard_find(&needle, &hay, scalar_start).map(|pos| hay.chars().take(pos).map(char::len_utf16).sum())
     } else {
-        let nc = chars(&needle);
-        (start..hc.len()).find(|&i| hc.get(i..i + nc.len()).is_some_and(|w| w == nc.as_slice()))
+        let nc = Utf16Text::new(&needle);
+        (start..hc.len()).find(|&i| hc.0.get(i..i + nc.len()).is_some_and(|w| w == nc.0.as_slice()))
     };
     match pos {
         Some(p) => num_val((p + 1) as f64),
@@ -259,6 +329,35 @@ fn find(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
 
 fn search(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     find_impl(a, true)
+}
+
+fn findb_impl(a: &[Arg], wild: bool) -> R<Value> {
+    let needle = text(a, 0)?;
+    let hay = text(a, 1)?;
+    let start = opt_num(a, 2, 1.0)?;
+    let hc = chars(&hay);
+    if start.is_nan() || start < 1.0 || start > hc.len().max(1) as f64 {
+        return Err(CellError::Value);
+    }
+    let start = start as usize - 1;
+    if needle.is_empty() {
+        return num_val((start + 1) as f64);
+    }
+    let pos = if wild {
+        wildcard_find(&needle, &hay, start)
+    } else {
+        let nc = chars(&needle);
+        (start..hc.len()).find(|&i| hc.get(i..i + nc.len()).is_some_and(|w| w == nc.as_slice()))
+    };
+    pos.map_or(Err(CellError::Value), |p| num_val((p + 1) as f64))
+}
+
+fn findb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    findb_impl(a, false)
+}
+
+fn searchb(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
+    findb_impl(a, true)
 }
 
 fn exact(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
@@ -909,13 +1008,13 @@ pub(crate) fn specs() -> Vec<FnSpec> {
             textjoin
         ),
         f!("LEFT", 1, 2, Text, S, "LEFT(text, [num_chars])", "Returns the first characters of a text.", left),
-        f!("LEFTB", 1, 2, Text, S, "LEFTB(text, [num_bytes])", "Byte version of LEFT (same as LEFT for single-byte text).", left),
+        f!("LEFTB", 1, 2, Text, S, "LEFTB(text, [num_bytes])", "Byte version of LEFT (same as LEFT for single-byte text).", leftb),
         f!("RIGHT", 1, 2, Text, S, "RIGHT(text, [num_chars])", "Returns the last characters of a text.", right),
-        f!("RIGHTB", 1, 2, Text, S, "RIGHTB(text, [num_bytes])", "Byte version of RIGHT (same as RIGHT for single-byte text).", right),
+        f!("RIGHTB", 1, 2, Text, S, "RIGHTB(text, [num_bytes])", "Byte version of RIGHT (same as RIGHT for single-byte text).", rightb),
         f!("MID", 3, 3, Text, S, "MID(text, start_num, num_chars)", "Returns characters from the middle of a text.", mid),
-        f!("MIDB", 3, 3, Text, S, "MIDB(text, start_num, num_bytes)", "Byte version of MID (same as MID for single-byte text).", mid),
+        f!("MIDB", 3, 3, Text, S, "MIDB(text, start_num, num_bytes)", "Byte version of MID (same as MID for single-byte text).", midb),
         f!("LEN", 1, 1, Text, S, "LEN(text)", "Counts the characters in a text.", len),
-        f!("LENB", 1, 1, Text, S, "LENB(text)", "Byte version of LEN (same as LEN for single-byte text).", len),
+        f!("LENB", 1, 1, Text, S, "LENB(text)", "Byte version of LEN (same as LEN for single-byte text).", lenb),
         f!("LOWER", 1, 1, Text, S, "LOWER(text)", "Converts text to lower case.", lower),
         f!("UPPER", 1, 1, Text, S, "UPPER(text)", "Converts text to upper case.", upper),
         f!("PROPER", 1, 1, Text, S, "PROPER(text)", "Capitalises the first letter of each word and lower-cases the rest.", proper),
@@ -932,10 +1031,10 @@ pub(crate) fn specs() -> Vec<FnSpec> {
             substitute
         ),
         f!("REPLACE", 4, 4, Text, S, "REPLACE(old_text, start_num, num_chars, new_text)", "Replaces part of a text by position.", replace),
-        f!("REPLACEB", 4, 4, Text, S, "REPLACEB(old_text, start_num, num_bytes, new_text)", "Byte version of REPLACE.", replace),
+        f!("REPLACEB", 4, 4, Text, S, "REPLACEB(old_text, start_num, num_bytes, new_text)", "Byte version of REPLACE.", replaceb),
         f!("REPT", 2, 2, Text, S, "REPT(text, number_times)", "Repeats a text a given number of times.", rept),
         f!("FIND", 2, 3, Text, S, "FIND(find_text, within_text, [start_num])", "Finds the position of one text in another (case-sensitive).", find),
-        f!("FINDB", 2, 3, Text, S, "FINDB(find_text, within_text, [start_num])", "Byte version of FIND.", find),
+        f!("FINDB", 2, 3, Text, S, "FINDB(find_text, within_text, [start_num])", "Byte version of FIND.", findb),
         f!(
             "SEARCH",
             2,
@@ -946,7 +1045,7 @@ pub(crate) fn specs() -> Vec<FnSpec> {
             "Finds the position of one text in another, ignoring case and allowing wildcards.",
             search
         ),
-        f!("SEARCHB", 2, 3, Text, S, "SEARCHB(find_text, within_text, [start_num])", "Byte version of SEARCH.", search),
+        f!("SEARCHB", 2, 3, Text, S, "SEARCHB(find_text, within_text, [start_num])", "Byte version of SEARCH.", searchb),
         f!("EXACT", 2, 2, Text, S, "EXACT(text1, text2)", "TRUE when two texts are identical, including case.", exact),
         f!("CHAR", 1, 1, Text, S, "CHAR(number)", "Returns the character for a code from the Windows-1252 character set.", char_fn),
         f!("CODE", 1, 1, Text, S, "CODE(text)", "Returns the Windows-1252 code of the first character of a text.", code),
@@ -1067,6 +1166,7 @@ pub(crate) fn specs() -> Vec<FnSpec> {
 #[cfg(test)]
 mod tests {
     use gridcraft_core::{CellError, Value};
+    use proptest::prelude::*;
 
     /// The pieces expand exactly as `regex::Captures::expand` does.
     #[test]
@@ -1083,6 +1183,43 @@ mod tests {
     }
 
     use crate::util::testutil::*;
+
+    #[test]
+    fn utf16_text_positions() {
+        for text in ["abc", "é中", "a😀b", "𠀀"] {
+            assert_eq!(ev("LEN", vec![t(text)]), Value::Number(text.encode_utf16().count() as f64));
+        }
+        is_text(ev("LEFT", vec![t("a😀b"), n(2.0)]), "a�");
+        is_text(ev("LEFT", vec![t("a😀b"), n(3.0)]), "a😀");
+        is_text(ev("RIGHT", vec![t("a😀b"), n(2.0)]), "�b");
+        is_text(ev("RIGHT", vec![t("a😀b"), n(3.0)]), "😀b");
+        is_text(ev("MID", vec![t("a😀b"), n(2.0), n(2.0)]), "😀");
+        is_text(ev("MID", vec![t("a😀b"), n(3.0), n(1.0)]), "�");
+        assert_eq!(ev("FIND", vec![t("b"), t("a😀b")]), Value::Number(4.0));
+        assert_eq!(ev("SEARCH", vec![t("B"), t("a😀b")]), Value::Number(4.0));
+        is_text(ev("REPLACE", vec![t("a😀b"), n(2.0), n(2.0), t("x")]), "axb");
+        is_text(ev("REPLACE", vec![t("a😀b"), n(3.0), n(0.0), t("")]), "a😀b");
+        is_text(ev("SUBSTITUTE", vec![t("a😀b"), t("😀"), t("x")]), "axb");
+        is_text(ev("LEFTB", vec![t("😀x"), n(1.0)]), "😀");
+        assert_eq!(ev("LENB", vec![t("😀")]), Value::Number(1.0));
+        assert_eq!(ev("FINDB", vec![t("x"), t("😀x")]), Value::Number(2.0));
+        is_err(ev("REPT", vec![t("😀"), n(16_384.0)]), CellError::Value);
+        is_err(ev("CONCATENATE", vec![t(&"😀".repeat(16_384))]), CellError::Value);
+    }
+
+    proptest! {
+        #[test]
+        fn utf16_length_and_boundary_reconstruction(chars in prop::collection::vec(any::<char>(), 0..80), cut in any::<usize>()) {
+            let text: String = chars.iter().collect();
+            let len = text.encode_utf16().count();
+            prop_assert_eq!(ev("LEN", vec![t(&text)]), Value::Number(len as f64));
+            let boundary = chars.iter().take(cut % (chars.len() + 1)).map(|ch| ch.len_utf16()).sum::<usize>();
+            let left = ev("LEFT", vec![t(&text), n(boundary as f64)]);
+            let mid = ev("MID", vec![t(&text), n((boundary + 1) as f64), n(len as f64)]);
+            let joined = ev("CONCATENATE", vec![crate::Arg::val(left), crate::Arg::val(mid)]);
+            prop_assert_eq!(joined, Value::from(text));
+        }
+    }
 
     #[test]
     fn bahttext() {

@@ -11,3 +11,6 @@ workspace = true
 [dependencies]
 gridcraft-core = { workspace = true }
 regex = { workspace = true }
+
+[dev-dependencies]
+proptest = "1"

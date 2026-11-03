@@ -228,19 +228,19 @@ fn unique(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     let once = opt_bool(args, 2, false)?;
     let base = if by_col { a.transpose() } else { a };
     let lines = rows_of(&base);
-    let mut counts: HashMap<String, usize> = HashMap::new();
-    for l in &lines {
-        *counts.entry(row_key(l)).or_insert(0) += 1;
+    // One key per row, shared by the counts pass and the dedup pass (#129: it used to be built
+    // twice, formatting every cell of the row each time).
+    let keys: Vec<String> = lines.iter().map(|l| row_key(l)).collect();
+    let mut counts: HashMap<&str, usize> = HashMap::new();
+    for k in &keys {
+        *counts.entry(k.as_str()).or_insert(0) += 1;
     }
+    // The exactly-once filter reads the counts before the dedup pass consumes the keys.
+    let keep: Vec<bool> = keys.iter().map(|k| !once || counts.get(k.as_str()).is_some_and(|c| *c == 1)).collect();
     let mut seen = std::collections::HashSet::new();
     let mut out = Vec::new();
-    for l in lines {
-        let k = row_key(&l);
-        let c = counts.get(&k).copied().unwrap_or(0);
-        if once && c != 1 {
-            continue;
-        }
-        if seen.insert(k) {
+    for ((l, k), keep) in lines.into_iter().zip(keys).zip(keep) {
+        if keep && seen.insert(k) {
             out.push(l);
         }
     }
@@ -785,11 +785,20 @@ fn groupby(args: &[Arg], c: &mut dyn Ctx) -> R<Value> {
             line
         })
         .collect();
-    // Sorting by a value column.
+    // Sorting by a value column: one decorated key per line (Schwartzian transform), not a
+    // fresh single-element key array cloned on every comparison (#129).
     if sort.unsigned_abs() as usize > rf.cols {
         let ci = sort.unsigned_abs() as usize - 1;
-        lines
-            .sort_by(|a, b| cmp_keys(&[a.get(ci).cloned().unwrap_or(Value::Empty)], &[b.get(ci).cloned().unwrap_or(Value::Empty)], &[sort.signum()]));
+        let orders = [sort.signum()];
+        let mut decorated: Vec<(Value, Vec<Value>)> = lines
+            .into_iter()
+            .map(|l| {
+                let k = l.get(ci).cloned().unwrap_or(Value::Empty);
+                (k, l)
+            })
+            .collect();
+        decorated.sort_by(|(ka, _), (kb, _)| cmp_keys(std::slice::from_ref(ka), std::slice::from_ref(kb), &orders));
+        lines = decorated.into_iter().map(|(_, l)| l).collect();
     }
     let mut out = Vec::new();
     if p.show_headers {
@@ -1068,9 +1077,13 @@ pub(crate) fn specs() -> Vec<FnSpec> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use gridcraft_core::{CellError, Value};
 
+    use crate::util::R;
     use crate::util::testutil::*;
+    use crate::{Arg, Ctx};
 
     fn grid() -> Value {
         arr(vec![vec![tv("b"), nv(2.0), nv(20.0)], vec![tv("a"), nv(3.0), nv(10.0)], vec![tv("c"), nv(1.0), nv(30.0)]])
@@ -1231,6 +1244,185 @@ mod tests {
         let item = arr(vec![vec![tv("Item")], vec![tv("A")], vec![tv("A")], vec![tv("B")], vec![tv("B")], vec![tv("A")]]);
         let amt = arr(vec![vec![tv("Amount")], vec![nv(10.0)], vec![nv(20.0)], vec![nv(5.0)], vec![nv(7.0)], vec![nv(1.0)]]);
         (region, item, amt)
+    }
+
+    /// The pre-#129 UNIQUE: every row key built twice, once per pass. The property test below
+    /// checks the single-build version against it.
+    fn unique_reference(lines: &[Vec<Value>], once: bool) -> Option<Vec<Vec<Value>>> {
+        let mut counts: HashMap<String, usize> = HashMap::new();
+        for l in lines {
+            *counts.entry(super::row_key(l)).or_insert(0) += 1;
+        }
+        let mut seen = std::collections::HashSet::new();
+        let mut out = Vec::new();
+        for l in lines {
+            let k = super::row_key(l);
+            let c = counts.get(&k).copied().unwrap_or(0);
+            if once && c != 1 {
+                continue;
+            }
+            if seen.insert(k) {
+                out.push(l.clone());
+            }
+        }
+        (!out.is_empty()).then_some(out)
+    }
+
+    /// #129: UNIQUE over seeded arrays equals the two-pass, twice-built-key implementation for
+    /// every by_col / exactly_once combination.
+    #[test]
+    fn unique_matches_the_twice_built_key_implementation() {
+        let mut state = 0x0DDB_1A5E_5BAD_5EED_u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state >> 11
+        };
+        let val = |r: u64| match r % 6 {
+            0 => Value::Number((r % 5) as f64),
+            1 => Value::Number((r % 3) as f64),
+            2 => Value::from(if r.is_multiple_of(2) { "a" } else { "A" }),
+            3 => Value::from("b"),
+            4 => Value::Bool(r.is_multiple_of(3)),
+            _ => Value::Empty,
+        };
+        for it in 0..300u64 {
+            let rows = 1 + (next() % 7) as usize;
+            let cols = 1 + (next() % 3) as usize;
+            let grid: Vec<Vec<Value>> = (0..rows).map(|_| (0..cols).map(|_| val(next())).collect()).collect();
+            let a = arr(grid);
+            for by_col in [false, true] {
+                for once in [false, true] {
+                    let lines = if by_col {
+                        rows_of(&match a.clone() {
+                            Value::Array(x) => Value::from(x.transpose()),
+                            _ => a.clone(),
+                        })
+                    } else {
+                        rows_of(&a)
+                    };
+                    let want = unique_reference(&lines, once);
+                    let got = ev("UNIQUE", vec![av(a.clone()), b(by_col), b(once)]);
+                    match want {
+                        None => is_err(got, CellError::Calc),
+                        Some(want) => {
+                            let got = if by_col {
+                                match got {
+                                    Value::Array(x) => Value::from(x.transpose()),
+                                    got => got,
+                                }
+                            } else {
+                                got
+                            };
+                            assert_eq!(rows_of(&got), want, "it={it} by_col={by_col} once={once} a={a:?}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// The pre-#129 GROUPBY, verbatim: its value-column sort cloned a fresh single-element key
+    /// array on every comparison. The property test below checks the decorated sort against it.
+    fn groupby_reference(args: &[Arg], c: &mut dyn Ctx) -> R<Value> {
+        use super::{agg_arg, aggregate_with, arr_arg, cmp_keys, distinct_keys, from_rows, key_row, opt_arr, opt_count, prepare, row_key};
+        let rf = arr_arg(args, 0)?;
+        let vals = arr_arg(args, 1)?;
+        let f = agg_arg(args, 2, c)?;
+        let fh = opt_count(args, 3)?;
+        let total = opt_count(args, 4)?.unwrap_or(1);
+        let sort = opt_count(args, 5)?.unwrap_or(1);
+        let filter = opt_arr(args, 6)?;
+        let p = prepare(&[&rf], &vals, fh, filter.as_ref())?;
+        let keys: Vec<Vec<Value>> = p.rows.iter().map(|&r| key_row(&rf, r)).collect();
+        let mut groups: HashMap<String, Vec<usize>> = HashMap::new();
+        for (k, &r) in keys.iter().zip(p.rows.iter()) {
+            groups.entry(row_key(k)).or_default().push(r);
+        }
+        let sort_in_keys = if sort.unsigned_abs() as usize <= rf.cols { sort } else { 0 };
+        let mut ordered = distinct_keys(&keys, sort_in_keys);
+        let mut agg_row = |rows: &[usize]| -> Vec<Value> {
+            (0..vals.cols)
+                .map(|col| {
+                    let vs: Vec<&Value> = rows.iter().filter_map(|&r| vals.get(r, col)).collect();
+                    aggregate_with(f, &vs, c)
+                })
+                .collect()
+        };
+        let mut lines: Vec<Vec<Value>> = ordered
+            .drain(..)
+            .map(|k| {
+                let rows = groups.get(&row_key(&k)).cloned().unwrap_or_default();
+                let mut line = k;
+                line.extend(agg_row(&rows));
+                line
+            })
+            .collect();
+        if sort.unsigned_abs() as usize > rf.cols {
+            let ci = sort.unsigned_abs() as usize - 1;
+            lines.sort_by(|a, b| {
+                cmp_keys(&[a.get(ci).cloned().unwrap_or(Value::Empty)], &[b.get(ci).cloned().unwrap_or(Value::Empty)], &[sort.signum()])
+            });
+        }
+        let mut out = Vec::new();
+        if p.show_headers {
+            let mut h = p.field_headers.clone();
+            h.extend(p.value_headers.iter().cloned());
+            out.push(h);
+        }
+        let mut total_line = vec![Value::from("Total")];
+        total_line.resize(rf.cols, Value::Empty);
+        total_line.extend(agg_row(&p.rows));
+        if total < 0 {
+            out.push(total_line);
+            out.extend(lines);
+        } else {
+            out.extend(lines);
+            if total > 0 {
+                out.push(total_line);
+            }
+        }
+        from_rows(out, &Value::Empty)
+    }
+
+    /// #129: GROUPBY over seeded arrays (duplicate and mixed-type keys, blanks, negative and
+    /// text amounts) equals the old per-comparison-clone implementation for key-column and
+    /// value-column sorts, both directions.
+    #[test]
+    fn groupby_matches_the_per_comparison_clone_sort() {
+        let mut state = 0x2545_F491_4F6C_DD1D_u64;
+        let mut next = move || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state >> 11
+        };
+        let key = |r: u64| match r % 4 {
+            0 => Value::from("x"),
+            1 => Value::from("y"),
+            2 => Value::Number((r % 2) as f64),
+            _ => Value::Empty,
+        };
+        let amt = |r: u64| match r % 5 {
+            0 | 1 => Value::Number((r % 7) as f64),
+            2 => Value::Empty,
+            3 => Value::from("n"),
+            _ => Value::Number(-((r % 9) as f64)),
+        };
+        for it in 0..300u64 {
+            let rows = 2 + (next() % 8) as usize;
+            let fields: Vec<Vec<Value>> = (0..rows).map(|_| vec![key(next())]).collect();
+            let values: Vec<Vec<Value>> = (0..rows).map(|_| vec![amt(next())]).collect();
+            let fields_v = arr(fields);
+            let values_v = arr(values);
+            for sort in [1i64, -1, 2, -2] {
+                let args = vec![rf(fields_v.clone()), rf(values_v.clone()), t("SUM"), n(0.0), n(0.0), n(sort as f64)];
+                let got = ev("GROUPBY", args.clone());
+                let want = crate::util::finish(groupby_reference(&args, &mut TestCtx::default()));
+                assert_eq!(got, want, "it={it} sort={sort} fields={fields_v:?} values={values_v:?}");
+            }
+        }
     }
 
     #[test]

@@ -1,8 +1,9 @@
 //! OPC package access: reading zip parts with decompression limits, relationships and part-name
 //! resolution; writing a zip package deterministically.
 
-use std::collections::HashMap;
-use std::io::{Cursor, Read, Write};
+use std::io::{Cursor, Write};
+
+use craft_ooxml::opc::{ContentTypes, LazyLimits, LazyPackage, OpcError, OpcLimits, TargetMode};
 
 use crate::IoError;
 use crate::xml::{self, El};
@@ -14,11 +15,27 @@ pub const MAX_TOTAL: u64 = 1024 * 1024 * 1024;
 /// Most entries accepted in the zip directory.
 pub const MAX_ENTRIES: usize = 200_000;
 
+/// The shared reader with gridcraft's limits: case-insensitive part names, `Ok(None)` for a
+/// missing part, and this crate's error type. The zip index, byte budget, bomb guard and
+/// relationship parsing are `craft-ooxml`'s.
 pub struct Package<'a> {
-    zip: zip::ZipArchive<Cursor<&'a [u8]>>,
-    /// Lower-case normalized part name → zip index.
-    names: HashMap<String, usize>,
-    total: u64,
+    pkg: LazyPackage<&'a [u8]>,
+}
+
+fn limits() -> OpcLimits {
+    let mut l = OpcLimits::default();
+    l.zip.max_entries = MAX_ENTRIES;
+    l.zip.max_entry_bytes = MAX_PART;
+    l.zip.max_total_bytes = MAX_TOTAL;
+    l.max_archive_bytes = usize::MAX;
+    l
+}
+
+fn io_error(e: OpcError) -> IoError {
+    match e {
+        OpcError::Limit(m) => IoError::TooLarge(m.into()),
+        e => IoError::Zip(e.to_string()),
+    }
 }
 
 /// A relationship.
@@ -39,21 +56,22 @@ pub fn normalize(name: &str) -> String {
 
 impl<'a> Package<'a> {
     pub fn open(bytes: &'a [u8]) -> Result<Package<'a>, IoError> {
-        let zip = zip::ZipArchive::new(Cursor::new(bytes)).map_err(|e| IoError::Zip(e.to_string()))?;
-        if zip.len() > MAX_ENTRIES {
-            return Err(IoError::TooLarge(format!("{} zip entries", zip.len())));
-        }
-        let mut names = HashMap::new();
-        for i in 0..zip.len() {
-            if let Some(n) = zip.name_for_index(i) {
-                names.entry(normalize(n)).or_insert(i);
-            }
-        }
-        Ok(Package { zip, names, total: 0 })
+        LazyPackage::open_with(bytes, &limits(), LazyLimits { charge_failed_reads_full_cap: true, no_expansion_ratio_guard: true })
+            .map(|pkg| Package { pkg })
+            .map_err(io_error)
+    }
+
+    /// The package's parsed `[Content_Types].xml` (empty when missing or unparseable).
+    pub fn content_types(&self) -> &ContentTypes {
+        &self.pkg.content_types
     }
 
     pub fn has(&self, part: &str) -> bool {
-        self.names.contains_key(&normalize(part))
+        self.stored(part).is_some()
+    }
+
+    fn stored(&self, part: &str) -> Option<String> {
+        self.pkg.find(&part.replace('\\', "/")).map(str::to_string)
     }
 
     /// Reads a part's bytes; `Ok(None)` when it doesn't exist.
@@ -61,52 +79,24 @@ impl<'a> Package<'a> {
         self.read_limited(part, MAX_PART)
     }
 
-    /// Reads a part the reader can do without (the caller warns and goes on when it fails). A read
-    /// that fails partway is charged this part's whole allowance (`maximum`, and the byte that
-    /// detects an overrun) instead of ending the package's: the decompression work stays bounded,
-    /// and the parts read after it still open.
+    /// Reads a part the reader can do without (the caller warns and goes on when it fails). A
+    /// damaged part is charged its whole allowance instead of ending the package's budget.
     pub fn read_optional_limited(&mut self, part: &str, maximum: u64) -> Result<Option<Vec<u8>>, IoError> {
-        let before = self.total;
-        let read = self.read_limited(part, maximum);
-        if let Err(IoError::Zip(_)) = &read {
-            self.total = before.saturating_add(maximum.min(MAX_PART).saturating_add(1)).min(MAX_TOTAL);
-        }
-        read
+        let Some(name) = self.stored(part) else { return Ok(None) };
+        self.pkg.read_optional(&name, maximum).map_err(io_error)
     }
 
-    /// Reads a small metadata part without allowing it to expand to the general part limit.
+    /// Reads a small metadata part without allowing it to expand to the general part limit. A
+    /// read that fails mid-part ends the package's budget.
     pub fn read_limited(&mut self, part: &str, maximum: u64) -> Result<Option<Vec<u8>>, IoError> {
-        let maximum = maximum.min(MAX_PART);
-        let Some(&idx) = self.names.get(&normalize(part)) else {
-            return Ok(None);
-        };
-        let mut f = self.zip.by_index(idx).map_err(|e| IoError::Zip(format!("{part}: {e}")))?;
-        if f.size() > maximum {
-            return Err(IoError::TooLarge(format!("{part} expands to {} bytes", f.size())));
+        let Some(name) = self.stored(part) else { return Ok(None) };
+        let declared = self.pkg.declared_size(&name).unwrap_or(0);
+        let read = self.pkg.read_optional(&name, maximum.min(MAX_PART));
+        if matches!(read, Err(OpcError::Corrupt(_))) || (matches!(read, Err(OpcError::Limit(_))) && declared <= maximum) {
+            // The work was spent; make the exhaustion terminal so later reads can't repeat it.
+            let _ = self.pkg.charge(u64::MAX);
         }
-        let remaining = MAX_TOTAL.saturating_sub(self.total);
-        let limit = maximum.min(remaining);
-        let mut out = Vec::with_capacity(f.size().min(16 * 1024 * 1024) as usize);
-        let read = (&mut f).take(limit + 1).read_to_end(&mut out).map_err(|e| {
-            // A read that fails partway has already spent decompression work and buffered data
-            // the package budget never sees: count the allowance as spent, so a loop over many
-            // broken parts can't decompress it over and over.
-            self.total = MAX_TOTAL;
-            IoError::Zip(format!("{part}: {e}"))
-        });
-        if out.len() as u64 > limit {
-            // The allowance was spent getting here; make the exhaustion terminal instead of
-            // letting later reads pay the same decompression cost again.
-            self.total = MAX_TOTAL;
-            return Err(IoError::TooLarge(if remaining < maximum {
-                "package expands to more than 1 GB".into()
-            } else {
-                format!("{part} expands to more than {maximum} bytes")
-            }));
-        }
-        read?;
-        self.total += out.len() as u64;
-        Ok(Some(out))
+        read.map_err(io_error)
     }
 
     pub fn read_xml(&mut self, part: &str) -> Result<Option<El>, IoError> {
@@ -119,25 +109,14 @@ impl<'a> Package<'a> {
     /// Relationships of a part (`xl/workbook.xml` → `xl/_rels/workbook.xml.rels`). Missing or
     /// broken rels parts give an empty list.
     pub fn rels(&mut self, part: &str) -> Result<Vec<Rel>, IoError> {
-        let (dir, file) = split_dir(part);
-        let rels_name = if dir.is_empty() { format!("_rels/{file}.rels") } else { format!("{dir}/_rels/{file}.rels") };
-        let root = match self.read(&rels_name)? {
-            Some(b) => match xml::parse(&b) {
-                Ok(r) => r,
-                Err(_) => return Ok(vec![]),
-            },
-            None => return Ok(vec![]),
-        };
-        Ok(root
-            .kids("Relationship")
-            .filter_map(|r| {
-                let id = r.attr("Id")?.to_string();
-                let ty = r.attr("Type").unwrap_or("");
-                let kind = ty.rsplit('/').next().unwrap_or("").to_string();
-                let target_raw = r.attr("Target")?;
-                let external = r.attr("TargetMode").is_some_and(|m| m.eq_ignore_ascii_case("External"));
-                let target = if external { target_raw.to_string() } else { resolve(dir, target_raw) };
-                Some(Rel { id, kind, target, external })
+        let rels = self.pkg.rels_of(part, MAX_PART).map_err(io_error)?;
+        Ok(rels
+            .into_iter()
+            .map(|r| Rel {
+                kind: r.kind.rsplit('/').next().unwrap_or("").to_string(),
+                external: r.mode == TargetMode::External,
+                id: r.id,
+                target: r.target,
             })
             .collect())
     }
@@ -145,11 +124,10 @@ impl<'a> Package<'a> {
 
 /// The first part whose declared unpacked size is over [`MAX_PART`], with that size.
 pub fn oversized_part(bytes: &[u8]) -> Option<(String, u64)> {
-    let mut zip = zip::ZipArchive::new(Cursor::new(bytes)).ok()?;
-    (0..zip.len().min(MAX_ENTRIES)).find_map(|i| {
-        let f = zip.by_index_raw(i).ok()?;
-        (f.size() > MAX_PART).then(|| (f.name().to_string(), f.size()))
-    })
+    let mut l = limits();
+    l.zip.max_entry_bytes = u64::MAX;
+    let pkg = LazyPackage::open(bytes, &l).ok()?;
+    pkg.part_names().find_map(|n| pkg.declared_size(n).filter(|&s| s > MAX_PART).map(|s| (n.to_string(), s)))
 }
 
 fn prefix(part: &str, e: IoError) -> IoError {
@@ -234,9 +212,9 @@ mod tests {
         let mut pkg = Package::open(&z).unwrap();
         assert!(pkg.read("a.xml").unwrap().is_some());
         // Nothing left to spend within the per-part limit either.
-        pkg.total = MAX_TOTAL - 1;
+        pkg.pkg.charge(MAX_TOTAL - pkg.pkg.total_read() - 1).unwrap();
         assert!(pkg.read("b.xml").is_err());
-        assert_eq!(pkg.total, MAX_TOTAL, "the failed read is charged");
+        assert_eq!(pkg.pkg.remaining_budget(), 0, "the failed read is charged");
         // Oversized repeated attempts stay cheap errors now: no allowance is left to pay for.
         assert!(matches!(pkg.read("b.xml"), Err(IoError::TooLarge(_))));
     }
@@ -257,10 +235,10 @@ mod tests {
         z[at] ^= 0x20;
         let mut pkg = Package::open(&z).unwrap();
         assert!(matches!(pkg.read_optional_limited("a.xml", 1024), Err(IoError::Zip(_))));
-        assert_eq!(pkg.total, 1025, "the failed read is charged its allowance");
+        assert_eq!(pkg.pkg.total_read(), 1024, "the failed read is charged its allowance");
         assert_eq!(pkg.read("b.xml").unwrap().as_deref(), Some(&b"hello"[..]));
         // An ordinary read of it still ends the package's budget.
         assert!(pkg.read("a.xml").is_err());
-        assert_eq!(pkg.total, MAX_TOTAL);
+        assert_eq!(pkg.pkg.remaining_budget(), 0);
     }
 }

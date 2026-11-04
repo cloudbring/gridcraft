@@ -49,54 +49,28 @@ fn chart_sheet_entries<'a>(wb_xml: &'a xml::El, wb_rels: &[PreservedRel], file_t
 pub struct KeptReader {
     on: bool,
     strict: bool,
-    defaults: HashMap<String, String>,
-    overrides: HashMap<String, String>,
+    types: craft_ooxml::opc::ContentTypes,
     budget: usize,
     parts_left: usize,
 }
 
 impl KeptReader {
     pub fn new(cx: &mut Ctx<'_>) -> KeptReader {
-        let mut k = KeptReader {
-            on: true,
-            strict: false,
-            defaults: HashMap::new(),
-            overrides: HashMap::new(),
-            budget: kept_total(),
-            parts_left: MAX_KEPT_PARTS,
-        };
+        let mut k = KeptReader { on: true, strict: false, types: cx.pkg.content_types().clone(), budget: kept_total(), parts_left: MAX_KEPT_PARTS };
         if let Ok(root) = raw_rels(cx, "")
             && root.iter().any(|r| r.rel_type.starts_with("http://purl.oclc.org/"))
         {
             k.on = false;
             k.strict = true;
         }
-        match cx.pkg.read_limited("[Content_Types].xml", MAX_META).ok().flatten().and_then(|b| xml::parse(&b).ok()) {
-            Some(types) => {
-                for d in types.kids("Default") {
-                    if let (Some(e), Some(t)) = (d.attr("Extension"), d.attr("ContentType")) {
-                        k.defaults.insert(e.to_ascii_lowercase(), t.to_string());
-                    }
-                }
-                for o in types.kids("Override") {
-                    if let (Some(p), Some(t)) = (o.attr("PartName"), o.attr("ContentType")) {
-                        k.overrides.insert(normalize(p), t.to_string());
-                    }
-                }
-            }
-            None => k.on = false,
+        if k.types.defaults.is_empty() && k.types.overrides.is_empty() {
+            k.on = false;
         }
         k
     }
 
     fn content_type(&self, part: &str) -> Option<String> {
-        let key = normalize(part);
-        if let Some(t) = self.overrides.get(&key) {
-            return Some(t.clone());
-        }
-        let (_, file) = package::split_dir(&key);
-        let ext = file.rsplit_once('.').map(|(_, e)| e)?;
-        self.defaults.get(ext).cloned()
+        self.types.of(part).map(str::to_string)
     }
 
     /// The parts reachable from `root` that aren't in `seen` yet. Fails (and keeps nothing) when the

@@ -1,0 +1,7327 @@
+{
+  "schema_version": 1,
+  "name": "gridcraft TEXTSPLIT, scaled-synthetic",
+  "revs": {
+    "old": "85e51e009c24fad47575f04d3c08f12342615d82",
+    "new": "024430150526eacc1a983f3cabbb7713ebc30749"
+  },
+  "fingerprint": {
+    "os": "macos",
+    "arch": "aarch64",
+    "kernel": "Darwin 27.0.0",
+    "cpu_model": "Apple M6",
+    "logical_cores": 12,
+    "physical_cores": 12,
+    "ram_bytes": 34359738368,
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28) (Homebrew)",
+    "profile": "release",
+    "opt_level": "3",
+    "debug_assertions": false,
+    "date": "2026-11-04T23:34:46+00:00"
+  },
+  "config": {
+    "requested_repetitions": 40,
+    "runs_per_side": 40,
+    "warmup_runs": 2,
+    "resamples": 4000,
+    "seed": 12648430,
+    "output_checked": true,
+    "cpu_time": "process"
+  },
+  "guard": {
+    "contended": false,
+    "reasons": [],
+    "load_before": 2.71,
+    "load_after": 4.28,
+    "logical_cores": 12,
+    "max_load_per_core": 0.5,
+    "load_threshold": 6.0,
+    "throttle_before": {
+      "speed_limit_pct": null,
+      "throttle_count": null
+    },
+    "throttle_after": {
+      "speed_limit_pct": null,
+      "throttle_count": null
+    }
+  },
+  "contended": false,
+  "publishable": true,
+  "inputs": [
+    {
+      "name": "1000 cells x 1 col-delims (4889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 83729.0,
+          "mad_ns": 2104.5,
+          "min_ns": 78792.0,
+          "max_ns": 98708.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 88771.0,
+          "mad_ns": 1730.0,
+          "min_ns": 85917.0,
+          "max_ns": 122792.0
+        },
+        "ratio": {
+          "point": 1.0602180845346296,
+          "ci_lo": 1.0410453649818991,
+          "ci_hi": 1.0864577301679212
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 84000.0,
+          "mad_ns": 2000.0,
+          "min_ns": 79000.0,
+          "max_ns": 95000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 89000.0,
+          "mad_ns": 2000.0,
+          "min_ns": 86000.0,
+          "max_ns": 105000.0
+        },
+        "ratio": {
+          "point": 1.0595238095238095,
+          "ci_lo": 1.04093567251462,
+          "ci_hi": 1.0853658536585367
+        }
+      }
+    },
+    {
+      "name": "1000 cells x 3 col-delims (4889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 100354.0,
+          "mad_ns": 3042.0,
+          "min_ns": 95292.0,
+          "max_ns": 132875.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 93791.5,
+          "mad_ns": 1854.0,
+          "min_ns": 90542.0,
+          "max_ns": 108625.0
+        },
+        "ratio": {
+          "point": 0.9346064930147279,
+          "ci_lo": 0.9140548625503461,
+          "ci_hi": 0.9561417118216512
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 100000.0,
+          "mad_ns": 3000.0,
+          "min_ns": 96000.0,
+          "max_ns": 123000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 94000.0,
+          "mad_ns": 2000.0,
+          "min_ns": 91000.0,
+          "max_ns": 109000.0
+        },
+        "ratio": {
+          "point": 0.94,
+          "ci_lo": 0.9121951219512195,
+          "ci_hi": 0.9547738693467337
+        }
+      }
+    },
+    {
+      "name": "1000 cells x 8 col-delims (4889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 143458.5,
+          "mad_ns": 5000.0,
+          "min_ns": 131166.0,
+          "max_ns": 276500.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 1161187.5,
+          "mad_ns": 15313.0,
+          "min_ns": 1103958.0,
+          "max_ns": 1393875.0
+        },
+        "ratio": {
+          "point": 8.09423979757212,
+          "ci_lo": 8.029361078816933,
+          "ci_hi": 8.272172276516189
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 143000.0,
+          "mad_ns": 5000.0,
+          "min_ns": 131000.0,
+          "max_ns": 186000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 1160500.0,
+          "mad_ns": 13500.0,
+          "min_ns": 1104000.0,
+          "max_ns": 1323000.0
+        },
+        "ratio": {
+          "point": 8.115384615384615,
+          "ci_lo": 8.020761245674741,
+          "ci_hi": 8.23404255319149
+        }
+      }
+    },
+    {
+      "name": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 102625.0,
+          "mad_ns": 3499.5,
+          "min_ns": 93375.0,
+          "max_ns": 136459.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 70646.0,
+          "mad_ns": 2729.5,
+          "min_ns": 66209.0,
+          "max_ns": 82583.0
+        },
+        "ratio": {
+          "point": 0.6883897685749086,
+          "ci_lo": 0.6613975370546482,
+          "ci_hi": 0.7162660953403299
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 103000.0,
+          "mad_ns": 3500.0,
+          "min_ns": 94000.0,
+          "max_ns": 126000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 71000.0,
+          "mad_ns": 2500.0,
+          "min_ns": 67000.0,
+          "max_ns": 82000.0
+        },
+        "ratio": {
+          "point": 0.6893203883495146,
+          "ci_lo": 0.6634615384615384,
+          "ci_hi": 0.72
+        }
+      }
+    },
+    {
+      "name": "10000 cells x 1 col-delims (58889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 875854.5,
+          "mad_ns": 18958.5,
+          "min_ns": 847292.0,
+          "max_ns": 947667.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 886208.5,
+          "mad_ns": 12875.5,
+          "min_ns": 859083.0,
+          "max_ns": 1116209.0
+        },
+        "ratio": {
+          "point": 1.011821598222079,
+          "ci_lo": 0.9968430565908405,
+          "ci_hi": 1.0337057241335557
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 874500.0,
+          "mad_ns": 17500.0,
+          "min_ns": 848000.0,
+          "max_ns": 936000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 886000.0,
+          "mad_ns": 11500.0,
+          "min_ns": 859000.0,
+          "max_ns": 1074000.0
+        },
+        "ratio": {
+          "point": 1.0131503716409376,
+          "ci_lo": 0.9954802259887006,
+          "ci_hi": 1.0316123873291283
+        }
+      }
+    },
+    {
+      "name": "10000 cells x 3 col-delims (58889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 1049375.0,
+          "mad_ns": 18937.5,
+          "min_ns": 1003792.0,
+          "max_ns": 1106375.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 928479.5,
+          "mad_ns": 11771.0,
+          "min_ns": 909166.0,
+          "max_ns": 961834.0
+        },
+        "ratio": {
+          "point": 0.8847928528886242,
+          "ci_lo": 0.8736090577611705,
+          "ci_hi": 0.9033279230688037
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 1041000.0,
+          "mad_ns": 21500.0,
+          "min_ns": 1005000.0,
+          "max_ns": 1101000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 929000.0,
+          "mad_ns": 11000.0,
+          "min_ns": 910000.0,
+          "max_ns": 960000.0
+        },
+        "ratio": {
+          "point": 0.8924111431316042,
+          "ci_lo": 0.8729333963155409,
+          "ci_hi": 0.9042101565636291
+        }
+      }
+    },
+    {
+      "name": "10000 cells x 8 col-delims (58889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 1513771.0,
+          "mad_ns": 44563.0,
+          "min_ns": 1449833.0,
+          "max_ns": 1633000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 11542979.0,
+          "mad_ns": 66791.5,
+          "min_ns": 11393542.0,
+          "max_ns": 11795917.0
+        },
+        "ratio": {
+          "point": 7.625313868478125,
+          "ci_lo": 7.3986762133207495,
+          "ci_hi": 7.759948386332981
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 1514000.0,
+          "mad_ns": 46000.0,
+          "min_ns": 1450000.0,
+          "max_ns": 1625000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 11533500.0,
+          "mad_ns": 63000.0,
+          "min_ns": 11383000.0,
+          "max_ns": 11712000.0
+        },
+        "ratio": {
+          "point": 7.617899603698811,
+          "ci_lo": 7.392612102646522,
+          "ci_hi": 7.749916191753268
+        }
+      }
+    },
+    {
+      "name": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 1144625.0,
+          "mad_ns": 33459.0,
+          "min_ns": 1021750.0,
+          "max_ns": 1198167.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 569833.0,
+          "mad_ns": 4959.0,
+          "min_ns": 556458.0,
+          "max_ns": 610000.0
+        },
+        "ratio": {
+          "point": 0.49783378835863273,
+          "ci_lo": 0.49041372183299015,
+          "ci_hi": 0.5092682934583199
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 1145500.0,
+          "mad_ns": 30000.0,
+          "min_ns": 1022000.0,
+          "max_ns": 1198000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 570000.0,
+          "mad_ns": 4000.0,
+          "min_ns": 557000.0,
+          "max_ns": 603000.0
+        },
+        "ratio": {
+          "point": 0.49759930161501525,
+          "ci_lo": 0.4913644214162349,
+          "ci_hi": 0.5160415725259828
+        }
+      }
+    },
+    {
+      "name": "100000 cells x 1 col-delims (688889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 9317813.0,
+          "mad_ns": 47917.0,
+          "min_ns": 8905500.0,
+          "max_ns": 9586459.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 9059396.0,
+          "mad_ns": 76771.0,
+          "min_ns": 8900458.0,
+          "max_ns": 9471875.0
+        },
+        "ratio": {
+          "point": 0.9722663461908927,
+          "ci_lo": 0.9648175315003137,
+          "ci_hi": 0.9792312621932487
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 9307500.0,
+          "mad_ns": 55000.0,
+          "min_ns": 8905000.0,
+          "max_ns": 9570000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 9046000.0,
+          "mad_ns": 75500.0,
+          "min_ns": 8892000.0,
+          "max_ns": 9417000.0
+        },
+        "ratio": {
+          "point": 0.971904378189632,
+          "ci_lo": 0.9655357526304488,
+          "ci_hi": 0.9786113499570077
+        }
+      }
+    },
+    {
+      "name": "100000 cells x 3 col-delims (688889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 11356333.0,
+          "mad_ns": 218062.5,
+          "min_ns": 10659334.0,
+          "max_ns": 12441542.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 9609374.5,
+          "mad_ns": 98770.5,
+          "min_ns": 9367958.0,
+          "max_ns": 10338000.0
+        },
+        "ratio": {
+          "point": 0.846168785293633,
+          "ci_lo": 0.833190671987635,
+          "ci_hi": 0.8581087790769711
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 11343000.0,
+          "mad_ns": 211500.0,
+          "min_ns": 10625000.0,
+          "max_ns": 12425000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 9593000.0,
+          "mad_ns": 103500.0,
+          "min_ns": 9368000.0,
+          "max_ns": 10229000.0
+        },
+        "ratio": {
+          "point": 0.8457198272062064,
+          "ci_lo": 0.8334496901998429,
+          "ci_hi": 0.8579613590939373
+        }
+      }
+    },
+    {
+      "name": "100000 cells x 8 col-delims (688889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 17103313.0,
+          "mad_ns": 612459.0,
+          "min_ns": 15877750.0,
+          "max_ns": 20640500.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 115870916.5,
+          "mad_ns": 367125.5,
+          "min_ns": 114353875.0,
+          "max_ns": 148478542.0
+        },
+        "ratio": {
+          "point": 6.774764427219451,
+          "ci_lo": 6.60819587746661,
+          "ci_hi": 6.961598635818328
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 17040000.0,
+          "mad_ns": 560000.0,
+          "min_ns": 15868000.0,
+          "max_ns": 19507000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 115662000.0,
+          "mad_ns": 339000.0,
+          "min_ns": 114173000.0,
+          "max_ns": 135246000.0
+        },
+        "ratio": {
+          "point": 6.787676056338028,
+          "ci_lo": 6.609571428571429,
+          "ci_hi": 6.963430004678548
+        }
+      }
+    },
+    {
+      "name": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "wall": {
+        "old": {
+          "n": 40,
+          "median_ns": 12425208.5,
+          "mad_ns": 457104.5,
+          "min_ns": 11877417.0,
+          "max_ns": 13637541.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 5772854.5,
+          "mad_ns": 64062.5,
+          "min_ns": 5593083.0,
+          "max_ns": 5993792.0
+        },
+        "ratio": {
+          "point": 0.4646082598935865,
+          "ci_lo": 0.44480525222009487,
+          "ci_hi": 0.473534768866575
+        }
+      },
+      "cpu": {
+        "old": {
+          "n": 40,
+          "median_ns": 12368500.0,
+          "mad_ns": 410500.0,
+          "min_ns": 11862000.0,
+          "max_ns": 13577000.0
+        },
+        "new": {
+          "n": 40,
+          "median_ns": 5767500.0,
+          "mad_ns": 53000.0,
+          "min_ns": 5594000.0,
+          "max_ns": 5954000.0
+        },
+        "ratio": {
+          "point": 0.4663055342199943,
+          "ci_lo": 0.44425170975818146,
+          "ci_hi": 0.4745083932667638
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "inputs": 12,
+    "wall": {
+      "point": 1.382119066822317,
+      "ci_lo": 1.3733470083448076,
+      "ci_hi": 1.39123458412114
+    },
+    "cpu": {
+      "point": 1.3846724012008182,
+      "ci_lo": 1.374283979396836,
+      "ci_hi": 1.3926797966249205
+    }
+  },
+  "runs": [
+    {
+      "order": 0,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 170792,
+      "cpu_ns": 168000
+    },
+    {
+      "order": 1,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1307000,
+      "cpu_ns": 1246000
+    },
+    {
+      "order": 2,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1294541,
+      "cpu_ns": 1234000
+    },
+    {
+      "order": 3,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 166917,
+      "cpu_ns": 161000
+    },
+    {
+      "order": 4,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 81250,
+      "cpu_ns": 77000
+    },
+    {
+      "order": 5,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 136459,
+      "cpu_ns": 126000
+    },
+    {
+      "order": 6,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 108417,
+      "cpu_ns": 108000
+    },
+    {
+      "order": 7,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 72458,
+      "cpu_ns": 73000
+    },
+    {
+      "order": 8,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 127512791,
+      "cpu_ns": 122332000
+    },
+    {
+      "order": 9,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 20640500,
+      "cpu_ns": 18180000
+    },
+    {
+      "order": 10,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 18331875,
+      "cpu_ns": 17574000
+    },
+    {
+      "order": 11,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 123458333,
+      "cpu_ns": 120806000
+    },
+    {
+      "order": 12,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 122458,
+      "cpu_ns": 123000
+    },
+    {
+      "order": 13,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 108625,
+      "cpu_ns": 109000
+    },
+    {
+      "order": 14,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 97459,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 15,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 115083,
+      "cpu_ns": 112000
+    },
+    {
+      "order": 16,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 112834,
+      "cpu_ns": 110000
+    },
+    {
+      "order": 17,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 98250,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 18,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 96417,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 19,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 104000,
+      "cpu_ns": 104000
+    },
+    {
+      "order": 20,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 151917,
+      "cpu_ns": 152000
+    },
+    {
+      "order": 21,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1237584,
+      "cpu_ns": 1224000
+    },
+    {
+      "order": 22,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1256958,
+      "cpu_ns": 1254000
+    },
+    {
+      "order": 23,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 156459,
+      "cpu_ns": 156000
+    },
+    {
+      "order": 24,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 602500,
+      "cpu_ns": 603000
+    },
+    {
+      "order": 25,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1180750,
+      "cpu_ns": 1178000
+    },
+    {
+      "order": 26,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1151250,
+      "cpu_ns": 1151000
+    },
+    {
+      "order": 27,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 573875,
+      "cpu_ns": 574000
+    },
+    {
+      "order": 28,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9483375,
+      "cpu_ns": 9460000
+    },
+    {
+      "order": 29,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9214625,
+      "cpu_ns": 9205000
+    },
+    {
+      "order": 30,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9123750,
+      "cpu_ns": 9117000
+    },
+    {
+      "order": 31,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9490916,
+      "cpu_ns": 9474000
+    },
+    {
+      "order": 32,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1181375,
+      "cpu_ns": 1182000
+    },
+    {
+      "order": 33,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143583,
+      "cpu_ns": 144000
+    },
+    {
+      "order": 34,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 136750,
+      "cpu_ns": 137000
+    },
+    {
+      "order": 35,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1180917,
+      "cpu_ns": 1174000
+    },
+    {
+      "order": 36,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1164667,
+      "cpu_ns": 1165000
+    },
+    {
+      "order": 37,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 137500,
+      "cpu_ns": 138000
+    },
+    {
+      "order": 38,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 135417,
+      "cpu_ns": 135000
+    },
+    {
+      "order": 39,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1171041,
+      "cpu_ns": 1172000
+    },
+    {
+      "order": 40,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 276500,
+      "cpu_ns": 186000
+    },
+    {
+      "order": 41,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1393875,
+      "cpu_ns": 1323000
+    },
+    {
+      "order": 42,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1280083,
+      "cpu_ns": 1256000
+    },
+    {
+      "order": 43,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143083,
+      "cpu_ns": 143000
+    },
+    {
+      "order": 44,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5836000,
+      "cpu_ns": 5826000
+    },
+    {
+      "order": 45,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12455917,
+      "cpu_ns": 12395000
+    },
+    {
+      "order": 46,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12042542,
+      "cpu_ns": 12021000
+    },
+    {
+      "order": 47,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5902500,
+      "cpu_ns": 5902000
+    },
+    {
+      "order": 48,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 89667,
+      "cpu_ns": 90000
+    },
+    {
+      "order": 49,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 94083,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 50,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 89709,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 51,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84791,
+      "cpu_ns": 85000
+    },
+    {
+      "order": 52,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 99209,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 53,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 94708,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 54,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93750,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 55,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 132875,
+      "cpu_ns": 121000
+    },
+    {
+      "order": 56,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1077125,
+      "cpu_ns": 1078000
+    },
+    {
+      "order": 57,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 574417,
+      "cpu_ns": 574000
+    },
+    {
+      "order": 58,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 576500,
+      "cpu_ns": 577000
+    },
+    {
+      "order": 59,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1076959,
+      "cpu_ns": 1077000
+    },
+    {
+      "order": 60,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 864833,
+      "cpu_ns": 865000
+    },
+    {
+      "order": 61,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 882417,
+      "cpu_ns": 882000
+    },
+    {
+      "order": 62,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 880875,
+      "cpu_ns": 881000
+    },
+    {
+      "order": 63,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 860875,
+      "cpu_ns": 861000
+    },
+    {
+      "order": 64,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12394500,
+      "cpu_ns": 12383000
+    },
+    {
+      "order": 65,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5746041,
+      "cpu_ns": 5735000
+    },
+    {
+      "order": 66,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5764000,
+      "cpu_ns": 5750000
+    },
+    {
+      "order": 67,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12330375,
+      "cpu_ns": 12319000
+    },
+    {
+      "order": 68,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11582667,
+      "cpu_ns": 11575000
+    },
+    {
+      "order": 69,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1486125,
+      "cpu_ns": 1487000
+    },
+    {
+      "order": 70,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1480209,
+      "cpu_ns": 1480000
+    },
+    {
+      "order": 71,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11588541,
+      "cpu_ns": 11575000
+    },
+    {
+      "order": 72,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92583,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 73,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 85417,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 74,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 83542,
+      "cpu_ns": 84000
+    },
+    {
+      "order": 75,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 89000,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 76,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 101875,
+      "cpu_ns": 102000
+    },
+    {
+      "order": 77,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 70917,
+      "cpu_ns": 71000
+    },
+    {
+      "order": 78,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68334,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 79,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 99084,
+      "cpu_ns": 99000
+    },
+    {
+      "order": 80,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9356250,
+      "cpu_ns": 9347000
+    },
+    {
+      "order": 81,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9295500,
+      "cpu_ns": 9285000
+    },
+    {
+      "order": 82,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9298000,
+      "cpu_ns": 9290000
+    },
+    {
+      "order": 83,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9102375,
+      "cpu_ns": 9079000
+    },
+    {
+      "order": 84,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11258083,
+      "cpu_ns": 11234000
+    },
+    {
+      "order": 85,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9817791,
+      "cpu_ns": 9795000
+    },
+    {
+      "order": 86,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9508708,
+      "cpu_ns": 9485000
+    },
+    {
+      "order": 87,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11280958,
+      "cpu_ns": 11263000
+    },
+    {
+      "order": 88,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11005167,
+      "cpu_ns": 10975000
+    },
+    {
+      "order": 89,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9718125,
+      "cpu_ns": 9712000
+    },
+    {
+      "order": 90,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9698458,
+      "cpu_ns": 9664000
+    },
+    {
+      "order": 91,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10659334,
+      "cpu_ns": 10625000
+    },
+    {
+      "order": 92,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 917209,
+      "cpu_ns": 911000
+    },
+    {
+      "order": 93,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 899584,
+      "cpu_ns": 900000
+    },
+    {
+      "order": 94,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 886500,
+      "cpu_ns": 887000
+    },
+    {
+      "order": 95,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 888167,
+      "cpu_ns": 888000
+    },
+    {
+      "order": 96,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5822625,
+      "cpu_ns": 5818000
+    },
+    {
+      "order": 97,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13526083,
+      "cpu_ns": 13496000
+    },
+    {
+      "order": 98,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12565583,
+      "cpu_ns": 12463000
+    },
+    {
+      "order": 99,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5883792,
+      "cpu_ns": 5868000
+    },
+    {
+      "order": 100,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11903583,
+      "cpu_ns": 11886000
+    },
+    {
+      "order": 101,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5707875,
+      "cpu_ns": 5708000
+    },
+    {
+      "order": 102,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5750250,
+      "cpu_ns": 5739000
+    },
+    {
+      "order": 103,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12599792,
+      "cpu_ns": 12585000
+    },
+    {
+      "order": 104,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 81875,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 105,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96542,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 106,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 95083,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 107,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68500,
+      "cpu_ns": 68000
+    },
+    {
+      "order": 108,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11910125,
+      "cpu_ns": 11869000
+    },
+    {
+      "order": 109,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5753792,
+      "cpu_ns": 5736000
+    },
+    {
+      "order": 110,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5870708,
+      "cpu_ns": 5813000
+    },
+    {
+      "order": 111,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11877417,
+      "cpu_ns": 11862000
+    },
+    {
+      "order": 112,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1452500,
+      "cpu_ns": 1453000
+    },
+    {
+      "order": 113,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11480625,
+      "cpu_ns": 11474000
+    },
+    {
+      "order": 114,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11529125,
+      "cpu_ns": 11514000
+    },
+    {
+      "order": 115,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1455583,
+      "cpu_ns": 1455000
+    },
+    {
+      "order": 116,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11555708,
+      "cpu_ns": 11533000
+    },
+    {
+      "order": 117,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9537000,
+      "cpu_ns": 9520000
+    },
+    {
+      "order": 118,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9652833,
+      "cpu_ns": 9653000
+    },
+    {
+      "order": 119,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11447292,
+      "cpu_ns": 11397000
+    },
+    {
+      "order": 120,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 98083,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 121,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 104209,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 122,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 100542,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 123,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91875,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 124,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1198167,
+      "cpu_ns": 1198000
+    },
+    {
+      "order": 125,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 572250,
+      "cpu_ns": 572000
+    },
+    {
+      "order": 126,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 567250,
+      "cpu_ns": 567000
+    },
+    {
+      "order": 127,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1174125,
+      "cpu_ns": 1174000
+    },
+    {
+      "order": 128,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5888750,
+      "cpu_ns": 5854000
+    },
+    {
+      "order": 129,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12120084,
+      "cpu_ns": 12108000
+    },
+    {
+      "order": 130,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11977375,
+      "cpu_ns": 11970000
+    },
+    {
+      "order": 131,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5793125,
+      "cpu_ns": 5772000
+    },
+    {
+      "order": 132,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 953333,
+      "cpu_ns": 953000
+    },
+    {
+      "order": 133,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1040333,
+      "cpu_ns": 1041000
+    },
+    {
+      "order": 134,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1033584,
+      "cpu_ns": 1034000
+    },
+    {
+      "order": 135,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 939542,
+      "cpu_ns": 939000
+    },
+    {
+      "order": 136,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9598958,
+      "cpu_ns": 9593000
+    },
+    {
+      "order": 137,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11259958,
+      "cpu_ns": 11218000
+    },
+    {
+      "order": 138,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11641041,
+      "cpu_ns": 11632000
+    },
+    {
+      "order": 139,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9767042,
+      "cpu_ns": 9705000
+    },
+    {
+      "order": 140,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 89625,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 141,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90417,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 142,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 86167,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 143,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 78792,
+      "cpu_ns": 79000
+    },
+    {
+      "order": 144,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 93375,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 145,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 71917,
+      "cpu_ns": 73000
+    },
+    {
+      "order": 146,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 66667,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 147,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96541,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 148,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 916583,
+      "cpu_ns": 917000
+    },
+    {
+      "order": 149,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1017709,
+      "cpu_ns": 1019000
+    },
+    {
+      "order": 150,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1091042,
+      "cpu_ns": 1076000
+    },
+    {
+      "order": 151,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 938959,
+      "cpu_ns": 940000
+    },
+    {
+      "order": 152,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 888958,
+      "cpu_ns": 889000
+    },
+    {
+      "order": 153,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 886417,
+      "cpu_ns": 886000
+    },
+    {
+      "order": 154,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 885166,
+      "cpu_ns": 886000
+    },
+    {
+      "order": 155,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 887875,
+      "cpu_ns": 888000
+    },
+    {
+      "order": 156,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 18169708,
+      "cpu_ns": 17987000
+    },
+    {
+      "order": 157,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115603083,
+      "cpu_ns": 115178000
+    },
+    {
+      "order": 158,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 114353875,
+      "cpu_ns": 114173000
+    },
+    {
+      "order": 159,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 15877750,
+      "cpu_ns": 15868000
+    },
+    {
+      "order": 160,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9615000,
+      "cpu_ns": 9563000
+    },
+    {
+      "order": 161,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11574417,
+      "cpu_ns": 11505000
+    },
+    {
+      "order": 162,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10902958,
+      "cpu_ns": 10888000
+    },
+    {
+      "order": 163,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9606416,
+      "cpu_ns": 9593000
+    },
+    {
+      "order": 164,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 909750,
+      "cpu_ns": 909000
+    },
+    {
+      "order": 165,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 886708,
+      "cpu_ns": 886000
+    },
+    {
+      "order": 166,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 881709,
+      "cpu_ns": 881000
+    },
+    {
+      "order": 167,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 884083,
+      "cpu_ns": 884000
+    },
+    {
+      "order": 168,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1176459,
+      "cpu_ns": 1177000
+    },
+    {
+      "order": 169,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 573459,
+      "cpu_ns": 573000
+    },
+    {
+      "order": 170,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 567458,
+      "cpu_ns": 568000
+    },
+    {
+      "order": 171,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1173208,
+      "cpu_ns": 1173000
+    },
+    {
+      "order": 172,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11561167,
+      "cpu_ns": 11550000
+    },
+    {
+      "order": 173,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9730334,
+      "cpu_ns": 9722000
+    },
+    {
+      "order": 174,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9771792,
+      "cpu_ns": 9757000
+    },
+    {
+      "order": 175,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11795750,
+      "cpu_ns": 11757000
+    },
+    {
+      "order": 176,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1064917,
+      "cpu_ns": 1065000
+    },
+    {
+      "order": 177,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 941916,
+      "cpu_ns": 942000
+    },
+    {
+      "order": 178,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 933625,
+      "cpu_ns": 934000
+    },
+    {
+      "order": 179,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1070459,
+      "cpu_ns": 1070000
+    },
+    {
+      "order": 180,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 82583,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 181,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105750,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 182,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105667,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 183,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 71334,
+      "cpu_ns": 72000
+    },
+    {
+      "order": 184,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 570583,
+      "cpu_ns": 571000
+    },
+    {
+      "order": 185,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1157459,
+      "cpu_ns": 1158000
+    },
+    {
+      "order": 186,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1144000,
+      "cpu_ns": 1145000
+    },
+    {
+      "order": 187,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 569083,
+      "cpu_ns": 569000
+    },
+    {
+      "order": 188,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90083,
+      "cpu_ns": 90000
+    },
+    {
+      "order": 189,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84750,
+      "cpu_ns": 84000
+    },
+    {
+      "order": 190,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82792,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 191,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87500,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 192,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 100250,
+      "cpu_ns": 101000
+    },
+    {
+      "order": 193,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92333,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 194,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91667,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 195,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 99625,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 196,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 66750,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 197,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 104250,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 198,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 102875,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 199,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 67250,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 200,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9218750,
+      "cpu_ns": 9206000
+    },
+    {
+      "order": 201,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9345208,
+      "cpu_ns": 9334000
+    },
+    {
+      "order": 202,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9277500,
+      "cpu_ns": 9269000
+    },
+    {
+      "order": 203,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9140166,
+      "cpu_ns": 9126000
+    },
+    {
+      "order": 204,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13637541,
+      "cpu_ns": 13577000
+    },
+    {
+      "order": 205,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5809041,
+      "cpu_ns": 5810000
+    },
+    {
+      "order": 206,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5749083,
+      "cpu_ns": 5742000
+    },
+    {
+      "order": 207,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13004417,
+      "cpu_ns": 12988000
+    },
+    {
+      "order": 208,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1034042,
+      "cpu_ns": 1034000
+    },
+    {
+      "order": 209,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 937750,
+      "cpu_ns": 939000
+    },
+    {
+      "order": 210,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 927417,
+      "cpu_ns": 928000
+    },
+    {
+      "order": 211,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1016584,
+      "cpu_ns": 1017000
+    },
+    {
+      "order": 212,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1476208,
+      "cpu_ns": 1467000
+    },
+    {
+      "order": 213,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11500958,
+      "cpu_ns": 11492000
+    },
+    {
+      "order": 214,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11393542,
+      "cpu_ns": 11383000
+    },
+    {
+      "order": 215,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1609583,
+      "cpu_ns": 1610000
+    },
+    {
+      "order": 216,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95542,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 217,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 103333,
+      "cpu_ns": 104000
+    },
+    {
+      "order": 218,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 102292,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 219,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93459,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 220,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9330542,
+      "cpu_ns": 9318000
+    },
+    {
+      "order": 221,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9250666,
+      "cpu_ns": 9184000
+    },
+    {
+      "order": 222,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9443708,
+      "cpu_ns": 9370000
+    },
+    {
+      "order": 223,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9412625,
+      "cpu_ns": 9397000
+    },
+    {
+      "order": 224,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 100083,
+      "cpu_ns": 101000
+    },
+    {
+      "order": 225,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 101666,
+      "cpu_ns": 102000
+    },
+    {
+      "order": 226,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 97375,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 227,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91917,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 228,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1156167,
+      "cpu_ns": 1157000
+    },
+    {
+      "order": 229,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 134667,
+      "cpu_ns": 134000
+    },
+    {
+      "order": 230,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 133208,
+      "cpu_ns": 134000
+    },
+    {
+      "order": 231,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1141334,
+      "cpu_ns": 1141000
+    },
+    {
+      "order": 232,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 851041,
+      "cpu_ns": 851000
+    },
+    {
+      "order": 233,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 877042,
+      "cpu_ns": 877000
+    },
+    {
+      "order": 234,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 868750,
+      "cpu_ns": 869000
+    },
+    {
+      "order": 235,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 850958,
+      "cpu_ns": 851000
+    },
+    {
+      "order": 236,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1050375,
+      "cpu_ns": 1033000
+    },
+    {
+      "order": 237,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 951750,
+      "cpu_ns": 945000
+    },
+    {
+      "order": 238,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 938000,
+      "cpu_ns": 938000
+    },
+    {
+      "order": 239,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1091375,
+      "cpu_ns": 1091000
+    },
+    {
+      "order": 240,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 107375,
+      "cpu_ns": 107000
+    },
+    {
+      "order": 241,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 71625,
+      "cpu_ns": 72000
+    },
+    {
+      "order": 242,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 67833,
+      "cpu_ns": 68000
+    },
+    {
+      "order": 243,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105917,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 244,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11550583,
+      "cpu_ns": 11539000
+    },
+    {
+      "order": 245,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1610916,
+      "cpu_ns": 1611000
+    },
+    {
+      "order": 246,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1606833,
+      "cpu_ns": 1607000
+    },
+    {
+      "order": 247,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11630250,
+      "cpu_ns": 11619000
+    },
+    {
+      "order": 248,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17500000,
+      "cpu_ns": 17364000
+    },
+    {
+      "order": 249,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115974084,
+      "cpu_ns": 115660000
+    },
+    {
+      "order": 250,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115002292,
+      "cpu_ns": 114760000
+    },
+    {
+      "order": 251,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17326625,
+      "cpu_ns": 17312000
+    },
+    {
+      "order": 252,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1157542,
+      "cpu_ns": 1158000
+    },
+    {
+      "order": 253,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 570833,
+      "cpu_ns": 571000
+    },
+    {
+      "order": 254,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 559208,
+      "cpu_ns": 560000
+    },
+    {
+      "order": 255,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1148250,
+      "cpu_ns": 1149000
+    },
+    {
+      "order": 256,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5625417,
+      "cpu_ns": 5608000
+    },
+    {
+      "order": 257,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12114333,
+      "cpu_ns": 12102000
+    },
+    {
+      "order": 258,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12050084,
+      "cpu_ns": 12039000
+    },
+    {
+      "order": 259,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5877333,
+      "cpu_ns": 5832000
+    },
+    {
+      "order": 260,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 902000,
+      "cpu_ns": 902000
+    },
+    {
+      "order": 261,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 899542,
+      "cpu_ns": 900000
+    },
+    {
+      "order": 262,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 890375,
+      "cpu_ns": 890000
+    },
+    {
+      "order": 263,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 897542,
+      "cpu_ns": 897000
+    },
+    {
+      "order": 264,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 921459,
+      "cpu_ns": 918000
+    },
+    {
+      "order": 265,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 894750,
+      "cpu_ns": 893000
+    },
+    {
+      "order": 266,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 847292,
+      "cpu_ns": 848000
+    },
+    {
+      "order": 267,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 865250,
+      "cpu_ns": 865000
+    },
+    {
+      "order": 268,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 913167,
+      "cpu_ns": 914000
+    },
+    {
+      "order": 269,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1005458,
+      "cpu_ns": 1005000
+    },
+    {
+      "order": 270,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1003792,
+      "cpu_ns": 1005000
+    },
+    {
+      "order": 271,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 909166,
+      "cpu_ns": 910000
+    },
+    {
+      "order": 272,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84042,
+      "cpu_ns": 84000
+    },
+    {
+      "order": 273,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87792,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 274,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 85917,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 275,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 80792,
+      "cpu_ns": 81000
+    },
+    {
+      "order": 276,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9445709,
+      "cpu_ns": 9431000
+    },
+    {
+      "order": 277,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10794667,
+      "cpu_ns": 10788000
+    },
+    {
+      "order": 278,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11267500,
+      "cpu_ns": 11260000
+    },
+    {
+      "order": 279,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9457250,
+      "cpu_ns": 9445000
+    },
+    {
+      "order": 280,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 78750,
+      "cpu_ns": 79000
+    },
+    {
+      "order": 281,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 99916,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 282,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96125,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 283,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 69541,
+      "cpu_ns": 70000
+    },
+    {
+      "order": 284,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1023041,
+      "cpu_ns": 1024000
+    },
+    {
+      "order": 285,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 913125,
+      "cpu_ns": 913000
+    },
+    {
+      "order": 286,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 957125,
+      "cpu_ns": 941000
+    },
+    {
+      "order": 287,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1083625,
+      "cpu_ns": 1083000
+    },
+    {
+      "order": 288,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13374833,
+      "cpu_ns": 13363000
+    },
+    {
+      "order": 289,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5853625,
+      "cpu_ns": 5806000
+    },
+    {
+      "order": 290,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5593083,
+      "cpu_ns": 5594000
+    },
+    {
+      "order": 291,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13420625,
+      "cpu_ns": 13407000
+    },
+    {
+      "order": 292,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 88083,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 293,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 88792,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 294,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 103833,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 295,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 98708,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 296,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9433875,
+      "cpu_ns": 9434000
+    },
+    {
+      "order": 297,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8927041,
+      "cpu_ns": 8916000
+    },
+    {
+      "order": 298,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9071042,
+      "cpu_ns": 9062000
+    },
+    {
+      "order": 299,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9155834,
+      "cpu_ns": 9145000
+    },
+    {
+      "order": 300,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1491541,
+      "cpu_ns": 1492000
+    },
+    {
+      "order": 301,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11661084,
+      "cpu_ns": 11650000
+    },
+    {
+      "order": 302,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11693584,
+      "cpu_ns": 11614000
+    },
+    {
+      "order": 303,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1583541,
+      "cpu_ns": 1585000
+    },
+    {
+      "order": 304,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 914541,
+      "cpu_ns": 915000
+    },
+    {
+      "order": 305,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1063875,
+      "cpu_ns": 1064000
+    },
+    {
+      "order": 306,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1059917,
+      "cpu_ns": 1060000
+    },
+    {
+      "order": 307,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 909834,
+      "cpu_ns": 910000
+    },
+    {
+      "order": 308,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17048209,
+      "cpu_ns": 17028000
+    },
+    {
+      "order": 309,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115507291,
+      "cpu_ns": 115323000
+    },
+    {
+      "order": 310,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115898292,
+      "cpu_ns": 115671000
+    },
+    {
+      "order": 311,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 18085834,
+      "cpu_ns": 18066000
+    },
+    {
+      "order": 312,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115729209,
+      "cpu_ns": 115592000
+    },
+    {
+      "order": 313,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 19562792,
+      "cpu_ns": 19507000
+    },
+    {
+      "order": 314,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 19404084,
+      "cpu_ns": 18971000
+    },
+    {
+      "order": 315,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 118762375,
+      "cpu_ns": 117505000
+    },
+    {
+      "order": 316,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11730167,
+      "cpu_ns": 11658000
+    },
+    {
+      "order": 317,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 10338000,
+      "cpu_ns": 10229000
+    },
+    {
+      "order": 318,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9880084,
+      "cpu_ns": 9836000
+    },
+    {
+      "order": 319,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11267750,
+      "cpu_ns": 11237000
+    },
+    {
+      "order": 320,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 151709,
+      "cpu_ns": 152000
+    },
+    {
+      "order": 321,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1181125,
+      "cpu_ns": 1181000
+    },
+    {
+      "order": 322,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1174625,
+      "cpu_ns": 1175000
+    },
+    {
+      "order": 323,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 140541,
+      "cpu_ns": 141000
+    },
+    {
+      "order": 324,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95667,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 325,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 99750,
+      "cpu_ns": 99000
+    },
+    {
+      "order": 326,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 98083,
+      "cpu_ns": 99000
+    },
+    {
+      "order": 327,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 94500,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 328,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 99167,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 329,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 70542,
+      "cpu_ns": 71000
+    },
+    {
+      "order": 330,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68000,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 331,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 98333,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 332,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11726125,
+      "cpu_ns": 11712000
+    },
+    {
+      "order": 333,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1511792,
+      "cpu_ns": 1512000
+    },
+    {
+      "order": 334,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1511417,
+      "cpu_ns": 1512000
+    },
+    {
+      "order": 335,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11460042,
+      "cpu_ns": 11449000
+    },
+    {
+      "order": 336,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17191333,
+      "cpu_ns": 17052000
+    },
+    {
+      "order": 337,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116658166,
+      "cpu_ns": 116415000
+    },
+    {
+      "order": 338,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116067125,
+      "cpu_ns": 115904000
+    },
+    {
+      "order": 339,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16610917,
+      "cpu_ns": 16514000
+    },
+    {
+      "order": 340,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5801959,
+      "cpu_ns": 5788000
+    },
+    {
+      "order": 341,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11958833,
+      "cpu_ns": 11946000
+    },
+    {
+      "order": 342,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12017750,
+      "cpu_ns": 12005000
+    },
+    {
+      "order": 343,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5816750,
+      "cpu_ns": 5802000
+    },
+    {
+      "order": 344,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 99542,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 345,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 74042,
+      "cpu_ns": 75000
+    },
+    {
+      "order": 346,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 69292,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 347,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 95791,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 348,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1045000,
+      "cpu_ns": 1046000
+    },
+    {
+      "order": 349,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 573834,
+      "cpu_ns": 574000
+    },
+    {
+      "order": 350,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 574125,
+      "cpu_ns": 574000
+    },
+    {
+      "order": 351,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1043375,
+      "cpu_ns": 1043000
+    },
+    {
+      "order": 352,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1048375,
+      "cpu_ns": 1048000
+    },
+    {
+      "order": 353,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 960125,
+      "cpu_ns": 960000
+    },
+    {
+      "order": 354,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 957958,
+      "cpu_ns": 958000
+    },
+    {
+      "order": 355,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1052292,
+      "cpu_ns": 1052000
+    },
+    {
+      "order": 356,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5806958,
+      "cpu_ns": 5791000
+    },
+    {
+      "order": 357,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12456250,
+      "cpu_ns": 12401000
+    },
+    {
+      "order": 358,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13435709,
+      "cpu_ns": 13407000
+    },
+    {
+      "order": 359,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5767292,
+      "cpu_ns": 5768000
+    },
+    {
+      "order": 360,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11298125,
+      "cpu_ns": 11289000
+    },
+    {
+      "order": 361,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9794583,
+      "cpu_ns": 9785000
+    },
+    {
+      "order": 362,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9773167,
+      "cpu_ns": 9765000
+    },
+    {
+      "order": 363,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11138292,
+      "cpu_ns": 11127000
+    },
+    {
+      "order": 364,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 896917,
+      "cpu_ns": 890000
+    },
+    {
+      "order": 365,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 910083,
+      "cpu_ns": 907000
+    },
+    {
+      "order": 366,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 893500,
+      "cpu_ns": 894000
+    },
+    {
+      "order": 367,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 874834,
+      "cpu_ns": 876000
+    },
+    {
+      "order": 368,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5835292,
+      "cpu_ns": 5824000
+    },
+    {
+      "order": 369,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13067708,
+      "cpu_ns": 12995000
+    },
+    {
+      "order": 370,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 11929709,
+      "cpu_ns": 11914000
+    },
+    {
+      "order": 371,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5788667,
+      "cpu_ns": 5789000
+    },
+    {
+      "order": 372,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9754625,
+      "cpu_ns": 9740000
+    },
+    {
+      "order": 373,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11116250,
+      "cpu_ns": 11092000
+    },
+    {
+      "order": 374,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11153125,
+      "cpu_ns": 11142000
+    },
+    {
+      "order": 375,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 10252459,
+      "cpu_ns": 10179000
+    },
+    {
+      "order": 376,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 947667,
+      "cpu_ns": 936000
+    },
+    {
+      "order": 377,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 911000,
+      "cpu_ns": 911000
+    },
+    {
+      "order": 378,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 897625,
+      "cpu_ns": 898000
+    },
+    {
+      "order": 379,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 883959,
+      "cpu_ns": 873000
+    },
+    {
+      "order": 380,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115708958,
+      "cpu_ns": 115444000
+    },
+    {
+      "order": 381,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17855750,
+      "cpu_ns": 17846000
+    },
+    {
+      "order": 382,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17741625,
+      "cpu_ns": 17685000
+    },
+    {
+      "order": 383,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115389750,
+      "cpu_ns": 115209000
+    },
+    {
+      "order": 384,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8987667,
+      "cpu_ns": 8977000
+    },
+    {
+      "order": 385,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9355083,
+      "cpu_ns": 9329000
+    },
+    {
+      "order": 386,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9336959,
+      "cpu_ns": 9314000
+    },
+    {
+      "order": 387,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8991458,
+      "cpu_ns": 8978000
+    },
+    {
+      "order": 388,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 111375,
+      "cpu_ns": 111000
+    },
+    {
+      "order": 389,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 75875,
+      "cpu_ns": 76000
+    },
+    {
+      "order": 390,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 66209,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 391,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105917,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 392,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 147375,
+      "cpu_ns": 147000
+    },
+    {
+      "order": 393,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1175834,
+      "cpu_ns": 1160000
+    },
+    {
+      "order": 394,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1149333,
+      "cpu_ns": 1149000
+    },
+    {
+      "order": 395,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 144583,
+      "cpu_ns": 144000
+    },
+    {
+      "order": 396,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 83916,
+      "cpu_ns": 84000
+    },
+    {
+      "order": 397,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87583,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 398,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 85959,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 399,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82625,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 400,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1150833,
+      "cpu_ns": 1151000
+    },
+    {
+      "order": 401,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143542,
+      "cpu_ns": 143000
+    },
+    {
+      "order": 402,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143917,
+      "cpu_ns": 145000
+    },
+    {
+      "order": 403,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1145208,
+      "cpu_ns": 1146000
+    },
+    {
+      "order": 404,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13453125,
+      "cpu_ns": 13444000
+    },
+    {
+      "order": 405,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5763209,
+      "cpu_ns": 5748000
+    },
+    {
+      "order": 406,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5778417,
+      "cpu_ns": 5779000
+    },
+    {
+      "order": 407,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13308875,
+      "cpu_ns": 13285000
+    },
+    {
+      "order": 408,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11462209,
+      "cpu_ns": 11444000
+    },
+    {
+      "order": 409,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9606291,
+      "cpu_ns": 9557000
+    },
+    {
+      "order": 410,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9612333,
+      "cpu_ns": 9601000
+    },
+    {
+      "order": 411,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11859250,
+      "cpu_ns": 11848000
+    },
+    {
+      "order": 412,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 588583,
+      "cpu_ns": 588000
+    },
+    {
+      "order": 413,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1171250,
+      "cpu_ns": 1158000
+    },
+    {
+      "order": 414,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1130042,
+      "cpu_ns": 1130000
+    },
+    {
+      "order": 415,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 572250,
+      "cpu_ns": 572000
+    },
+    {
+      "order": 416,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 884000,
+      "cpu_ns": 885000
+    },
+    {
+      "order": 417,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 928042,
+      "cpu_ns": 906000
+    },
+    {
+      "order": 418,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 1116209,
+      "cpu_ns": 1074000
+    },
+    {
+      "order": 419,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 880250,
+      "cpu_ns": 881000
+    },
+    {
+      "order": 420,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11553417,
+      "cpu_ns": 11537000
+    },
+    {
+      "order": 421,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1563917,
+      "cpu_ns": 1564000
+    },
+    {
+      "order": 422,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1557542,
+      "cpu_ns": 1557000
+    },
+    {
+      "order": 423,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11507917,
+      "cpu_ns": 11494000
+    },
+    {
+      "order": 424,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 102917,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 425,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93542,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 426,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91417,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 427,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 100959,
+      "cpu_ns": 102000
+    },
+    {
+      "order": 428,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9278791,
+      "cpu_ns": 9267000
+    },
+    {
+      "order": 429,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9420708,
+      "cpu_ns": 9380000
+    },
+    {
+      "order": 430,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9586459,
+      "cpu_ns": 9570000
+    },
+    {
+      "order": 431,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9117250,
+      "cpu_ns": 9105000
+    },
+    {
+      "order": 432,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 879792,
+      "cpu_ns": 879000
+    },
+    {
+      "order": 433,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 884750,
+      "cpu_ns": 884000
+    },
+    {
+      "order": 434,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 876875,
+      "cpu_ns": 876000
+    },
+    {
+      "order": 435,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 905667,
+      "cpu_ns": 892000
+    },
+    {
+      "order": 436,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93333,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 437,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 88083,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 438,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 85750,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 439,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90916,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 440,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115235167,
+      "cpu_ns": 115072000
+    },
+    {
+      "order": 441,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17929667,
+      "cpu_ns": 17867000
+    },
+    {
+      "order": 442,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17785459,
+      "cpu_ns": 17761000
+    },
+    {
+      "order": 443,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115864208,
+      "cpu_ns": 115664000
+    },
+    {
+      "order": 444,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 574792,
+      "cpu_ns": 576000
+    },
+    {
+      "order": 445,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1155292,
+      "cpu_ns": 1155000
+    },
+    {
+      "order": 446,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1184375,
+      "cpu_ns": 1169000
+    },
+    {
+      "order": 447,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 561292,
+      "cpu_ns": 561000
+    },
+    {
+      "order": 448,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90583,
+      "cpu_ns": 90000
+    },
+    {
+      "order": 449,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84041,
+      "cpu_ns": 85000
+    },
+    {
+      "order": 450,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 81250,
+      "cpu_ns": 81000
+    },
+    {
+      "order": 451,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87625,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 452,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115708125,
+      "cpu_ns": 115543000
+    },
+    {
+      "order": 453,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16492458,
+      "cpu_ns": 16470000
+    },
+    {
+      "order": 454,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17158417,
+      "cpu_ns": 17103000
+    },
+    {
+      "order": 455,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 117530375,
+      "cpu_ns": 117303000
+    },
+    {
+      "order": 456,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 18295375,
+      "cpu_ns": 18182000
+    },
+    {
+      "order": 457,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116241542,
+      "cpu_ns": 115925000
+    },
+    {
+      "order": 458,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115718125,
+      "cpu_ns": 115467000
+    },
+    {
+      "order": 459,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16995042,
+      "cpu_ns": 16963000
+    },
+    {
+      "order": 460,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 957958,
+      "cpu_ns": 958000
+    },
+    {
+      "order": 461,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1100417,
+      "cpu_ns": 1101000
+    },
+    {
+      "order": 462,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1095125,
+      "cpu_ns": 1095000
+    },
+    {
+      "order": 463,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 943167,
+      "cpu_ns": 944000
+    },
+    {
+      "order": 464,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 108416,
+      "cpu_ns": 108000
+    },
+    {
+      "order": 465,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 74250,
+      "cpu_ns": 75000
+    },
+    {
+      "order": 466,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 71083,
+      "cpu_ns": 71000
+    },
+    {
+      "order": 467,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105041,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 468,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11288250,
+      "cpu_ns": 11255000
+    },
+    {
+      "order": 469,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9683416,
+      "cpu_ns": 9664000
+    },
+    {
+      "order": 470,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9877458,
+      "cpu_ns": 9860000
+    },
+    {
+      "order": 471,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11769167,
+      "cpu_ns": 11721000
+    },
+    {
+      "order": 472,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11512375,
+      "cpu_ns": 11493000
+    },
+    {
+      "order": 473,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1601208,
+      "cpu_ns": 1601000
+    },
+    {
+      "order": 474,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1589875,
+      "cpu_ns": 1590000
+    },
+    {
+      "order": 475,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11414959,
+      "cpu_ns": 11402000
+    },
+    {
+      "order": 476,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13313500,
+      "cpu_ns": 13290000
+    },
+    {
+      "order": 477,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5679375,
+      "cpu_ns": 5679000
+    },
+    {
+      "order": 478,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5743458,
+      "cpu_ns": 5724000
+    },
+    {
+      "order": 479,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12168875,
+      "cpu_ns": 12154000
+    },
+    {
+      "order": 480,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 944541,
+      "cpu_ns": 945000
+    },
+    {
+      "order": 481,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1037500,
+      "cpu_ns": 1038000
+    },
+    {
+      "order": 482,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1034250,
+      "cpu_ns": 1034000
+    },
+    {
+      "order": 483,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 935125,
+      "cpu_ns": 935000
+    },
+    {
+      "order": 484,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92208,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 485,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 85000,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 486,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 83000,
+      "cpu_ns": 83000
+    },
+    {
+      "order": 487,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 88542,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 488,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9184125,
+      "cpu_ns": 9168000
+    },
+    {
+      "order": 489,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9471875,
+      "cpu_ns": 9417000
+    },
+    {
+      "order": 490,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8945875,
+      "cpu_ns": 8931000
+    },
+    {
+      "order": 491,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9346875,
+      "cpu_ns": 9335000
+    },
+    {
+      "order": 492,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9058500,
+      "cpu_ns": 9040000
+    },
+    {
+      "order": 493,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9322417,
+      "cpu_ns": 9311000
+    },
+    {
+      "order": 494,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9152375,
+      "cpu_ns": 9142000
+    },
+    {
+      "order": 495,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9212250,
+      "cpu_ns": 9202000
+    },
+    {
+      "order": 496,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 104084,
+      "cpu_ns": 104000
+    },
+    {
+      "order": 497,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 77250,
+      "cpu_ns": 77000
+    },
+    {
+      "order": 498,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68209,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 499,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96750,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 500,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12049000,
+      "cpu_ns": 12038000
+    },
+    {
+      "order": 501,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5779542,
+      "cpu_ns": 5767000
+    },
+    {
+      "order": 502,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5619041,
+      "cpu_ns": 5620000
+    },
+    {
+      "order": 503,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13019083,
+      "cpu_ns": 13006000
+    },
+    {
+      "order": 504,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 148478542,
+      "cpu_ns": 135246000
+    },
+    {
+      "order": 505,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16640750,
+      "cpu_ns": 16552000
+    },
+    {
+      "order": 506,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16751708,
+      "cpu_ns": 16637000
+    },
+    {
+      "order": 507,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116207375,
+      "cpu_ns": 115635000
+    },
+    {
+      "order": 508,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116053208,
+      "cpu_ns": 115880000
+    },
+    {
+      "order": 509,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17177000,
+      "cpu_ns": 17154000
+    },
+    {
+      "order": 510,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16870250,
+      "cpu_ns": 16845000
+    },
+    {
+      "order": 511,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 114931083,
+      "cpu_ns": 114636000
+    },
+    {
+      "order": 512,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5616084,
+      "cpu_ns": 5617000
+    },
+    {
+      "order": 513,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12576333,
+      "cpu_ns": 12315000
+    },
+    {
+      "order": 514,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12235584,
+      "cpu_ns": 12105000
+    },
+    {
+      "order": 515,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5677417,
+      "cpu_ns": 5678000
+    },
+    {
+      "order": 516,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 91375,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 517,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92750,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 518,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 88750,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 519,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84625,
+      "cpu_ns": 85000
+    },
+    {
+      "order": 520,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 83541,
+      "cpu_ns": 83000
+    },
+    {
+      "order": 521,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 122792,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 522,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90500,
+      "cpu_ns": 90000
+    },
+    {
+      "order": 523,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82083,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 524,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 566000,
+      "cpu_ns": 567000
+    },
+    {
+      "order": 525,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1021750,
+      "cpu_ns": 1022000
+    },
+    {
+      "order": 526,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1032083,
+      "cpu_ns": 1032000
+    },
+    {
+      "order": 527,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 581667,
+      "cpu_ns": 574000
+    },
+    {
+      "order": 528,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 136875,
+      "cpu_ns": 137000
+    },
+    {
+      "order": 529,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1144708,
+      "cpu_ns": 1145000
+    },
+    {
+      "order": 530,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1138250,
+      "cpu_ns": 1140000
+    },
+    {
+      "order": 531,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 134542,
+      "cpu_ns": 134000
+    },
+    {
+      "order": 532,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 871875,
+      "cpu_ns": 872000
+    },
+    {
+      "order": 533,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 850000,
+      "cpu_ns": 850000
+    },
+    {
+      "order": 534,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 850375,
+      "cpu_ns": 850000
+    },
+    {
+      "order": 535,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 872041,
+      "cpu_ns": 872000
+    },
+    {
+      "order": 536,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9008875,
+      "cpu_ns": 8998000
+    },
+    {
+      "order": 537,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9266125,
+      "cpu_ns": 9257000
+    },
+    {
+      "order": 538,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9433000,
+      "cpu_ns": 9378000
+    },
+    {
+      "order": 539,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9092250,
+      "cpu_ns": 9075000
+    },
+    {
+      "order": 540,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9091042,
+      "cpu_ns": 9077000
+    },
+    {
+      "order": 541,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9339958,
+      "cpu_ns": 9323000
+    },
+    {
+      "order": 542,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9313209,
+      "cpu_ns": 9304000
+    },
+    {
+      "order": 543,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8989042,
+      "cpu_ns": 8976000
+    },
+    {
+      "order": 544,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1561917,
+      "cpu_ns": 1562000
+    },
+    {
+      "order": 545,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11488500,
+      "cpu_ns": 11478000
+    },
+    {
+      "order": 546,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11589875,
+      "cpu_ns": 11540000
+    },
+    {
+      "order": 547,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1554459,
+      "cpu_ns": 1554000
+    },
+    {
+      "order": 548,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 565959,
+      "cpu_ns": 566000
+    },
+    {
+      "order": 549,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1164708,
+      "cpu_ns": 1151000
+    },
+    {
+      "order": 550,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1129500,
+      "cpu_ns": 1129000
+    },
+    {
+      "order": 551,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 561750,
+      "cpu_ns": 562000
+    },
+    {
+      "order": 552,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9292208,
+      "cpu_ns": 9283000
+    },
+    {
+      "order": 553,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9060292,
+      "cpu_ns": 9044000
+    },
+    {
+      "order": 554,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9000791,
+      "cpu_ns": 9002000
+    },
+    {
+      "order": 555,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9328458,
+      "cpu_ns": 9313000
+    },
+    {
+      "order": 556,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 149459,
+      "cpu_ns": 149000
+    },
+    {
+      "order": 557,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1202334,
+      "cpu_ns": 1187000
+    },
+    {
+      "order": 558,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1161458,
+      "cpu_ns": 1161000
+    },
+    {
+      "order": 559,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143375,
+      "cpu_ns": 143000
+    },
+    {
+      "order": 560,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1558125,
+      "cpu_ns": 1558000
+    },
+    {
+      "order": 561,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11676292,
+      "cpu_ns": 11662000
+    },
+    {
+      "order": 562,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11721583,
+      "cpu_ns": 11679000
+    },
+    {
+      "order": 563,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1553166,
+      "cpu_ns": 1553000
+    },
+    {
+      "order": 564,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11686209,
+      "cpu_ns": 11662000
+    },
+    {
+      "order": 565,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1534041,
+      "cpu_ns": 1534000
+    },
+    {
+      "order": 566,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1564458,
+      "cpu_ns": 1565000
+    },
+    {
+      "order": 567,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11416834,
+      "cpu_ns": 11398000
+    },
+    {
+      "order": 568,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8941750,
+      "cpu_ns": 8931000
+    },
+    {
+      "order": 569,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9290084,
+      "cpu_ns": 9278000
+    },
+    {
+      "order": 570,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9248041,
+      "cpu_ns": 9237000
+    },
+    {
+      "order": 571,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8983083,
+      "cpu_ns": 8970000
+    },
+    {
+      "order": 572,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11526209,
+      "cpu_ns": 11474000
+    },
+    {
+      "order": 573,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9556959,
+      "cpu_ns": 9544000
+    },
+    {
+      "order": 574,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9512500,
+      "cpu_ns": 9494000
+    },
+    {
+      "order": 575,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11453291,
+      "cpu_ns": 11440000
+    },
+    {
+      "order": 576,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 148292,
+      "cpu_ns": 148000
+    },
+    {
+      "order": 577,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1158375,
+      "cpu_ns": 1159000
+    },
+    {
+      "order": 578,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1159125,
+      "cpu_ns": 1159000
+    },
+    {
+      "order": 579,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143167,
+      "cpu_ns": 143000
+    },
+    {
+      "order": 580,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1057541,
+      "cpu_ns": 1057000
+    },
+    {
+      "order": 581,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 920708,
+      "cpu_ns": 921000
+    },
+    {
+      "order": 582,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 922292,
+      "cpu_ns": 923000
+    },
+    {
+      "order": 583,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1062125,
+      "cpu_ns": 1062000
+    },
+    {
+      "order": 584,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 906125,
+      "cpu_ns": 887000
+    },
+    {
+      "order": 585,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 868583,
+      "cpu_ns": 868000
+    },
+    {
+      "order": 586,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 871875,
+      "cpu_ns": 872000
+    },
+    {
+      "order": 587,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 863458,
+      "cpu_ns": 863000
+    },
+    {
+      "order": 588,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 69209,
+      "cpu_ns": 70000
+    },
+    {
+      "order": 589,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105833,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 590,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105166,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 591,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 66875,
+      "cpu_ns": 68000
+    },
+    {
+      "order": 592,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 564458,
+      "cpu_ns": 565000
+    },
+    {
+      "order": 593,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1165083,
+      "cpu_ns": 1165000
+    },
+    {
+      "order": 594,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1164417,
+      "cpu_ns": 1165000
+    },
+    {
+      "order": 595,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 578750,
+      "cpu_ns": 572000
+    },
+    {
+      "order": 596,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13301416,
+      "cpu_ns": 13227000
+    },
+    {
+      "order": 597,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5636875,
+      "cpu_ns": 5637000
+    },
+    {
+      "order": 598,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5700042,
+      "cpu_ns": 5655000
+    },
+    {
+      "order": 599,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12992125,
+      "cpu_ns": 12978000
+    },
+    {
+      "order": 600,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 80292,
+      "cpu_ns": 80000
+    },
+    {
+      "order": 601,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 107208,
+      "cpu_ns": 108000
+    },
+    {
+      "order": 602,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 105375,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 603,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68333,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 604,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 68833,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 605,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 104667,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 606,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 104416,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 607,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 67292,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 608,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9003750,
+      "cpu_ns": 8993000
+    },
+    {
+      "order": 609,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9310625,
+      "cpu_ns": 9301000
+    },
+    {
+      "order": 610,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9273667,
+      "cpu_ns": 9261000
+    },
+    {
+      "order": 611,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8982167,
+      "cpu_ns": 8971000
+    },
+    {
+      "order": 612,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11579917,
+      "cpu_ns": 11572000
+    },
+    {
+      "order": 613,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1574167,
+      "cpu_ns": 1574000
+    },
+    {
+      "order": 614,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1561916,
+      "cpu_ns": 1562000
+    },
+    {
+      "order": 615,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11501250,
+      "cpu_ns": 11492000
+    },
+    {
+      "order": 616,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 146916,
+      "cpu_ns": 147000
+    },
+    {
+      "order": 617,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1160917,
+      "cpu_ns": 1161000
+    },
+    {
+      "order": 618,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1261375,
+      "cpu_ns": 1214000
+    },
+    {
+      "order": 619,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 138583,
+      "cpu_ns": 139000
+    },
+    {
+      "order": 620,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 916834,
+      "cpu_ns": 918000
+    },
+    {
+      "order": 621,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1066166,
+      "cpu_ns": 1067000
+    },
+    {
+      "order": 622,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1060708,
+      "cpu_ns": 1061000
+    },
+    {
+      "order": 623,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 918625,
+      "cpu_ns": 919000
+    },
+    {
+      "order": 624,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 560291,
+      "cpu_ns": 560000
+    },
+    {
+      "order": 625,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1140083,
+      "cpu_ns": 1140000
+    },
+    {
+      "order": 626,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1139416,
+      "cpu_ns": 1140000
+    },
+    {
+      "order": 627,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 559708,
+      "cpu_ns": 560000
+    },
+    {
+      "order": 628,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 918292,
+      "cpu_ns": 918000
+    },
+    {
+      "order": 629,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1106375,
+      "cpu_ns": 1091000
+    },
+    {
+      "order": 630,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1065750,
+      "cpu_ns": 1066000
+    },
+    {
+      "order": 631,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 919750,
+      "cpu_ns": 920000
+    },
+    {
+      "order": 632,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9285916,
+      "cpu_ns": 9273000
+    },
+    {
+      "order": 633,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8983458,
+      "cpu_ns": 8973000
+    },
+    {
+      "order": 634,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8946875,
+      "cpu_ns": 8948000
+    },
+    {
+      "order": 635,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9256250,
+      "cpu_ns": 9244000
+    },
+    {
+      "order": 636,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116049666,
+      "cpu_ns": 115703000
+    },
+    {
+      "order": 637,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16309666,
+      "cpu_ns": 16275000
+    },
+    {
+      "order": 638,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16530291,
+      "cpu_ns": 16525000
+    },
+    {
+      "order": 639,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115554667,
+      "cpu_ns": 115328000
+    },
+    {
+      "order": 640,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9517000,
+      "cpu_ns": 9507000
+    },
+    {
+      "order": 641,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10878625,
+      "cpu_ns": 10869000
+    },
+    {
+      "order": 642,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10840959,
+      "cpu_ns": 10831000
+    },
+    {
+      "order": 643,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9483959,
+      "cpu_ns": 9473000
+    },
+    {
+      "order": 644,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 878459,
+      "cpu_ns": 879000
+    },
+    {
+      "order": 645,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 856875,
+      "cpu_ns": 857000
+    },
+    {
+      "order": 646,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 850458,
+      "cpu_ns": 851000
+    },
+    {
+      "order": 647,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 859083,
+      "cpu_ns": 859000
+    },
+    {
+      "order": 648,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 875625,
+      "cpu_ns": 876000
+    },
+    {
+      "order": 649,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 851875,
+      "cpu_ns": 853000
+    },
+    {
+      "order": 650,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 849375,
+      "cpu_ns": 849000
+    },
+    {
+      "order": 651,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 994042,
+      "cpu_ns": 948000
+    },
+    {
+      "order": 652,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12269333,
+      "cpu_ns": 12253000
+    },
+    {
+      "order": 653,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5693333,
+      "cpu_ns": 5694000
+    },
+    {
+      "order": 654,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5658375,
+      "cpu_ns": 5647000
+    },
+    {
+      "order": 655,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12152792,
+      "cpu_ns": 12141000
+    },
+    {
+      "order": 656,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1027125,
+      "cpu_ns": 1028000
+    },
+    {
+      "order": 657,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 925875,
+      "cpu_ns": 926000
+    },
+    {
+      "order": 658,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 914792,
+      "cpu_ns": 915000
+    },
+    {
+      "order": 659,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1052791,
+      "cpu_ns": 1038000
+    },
+    {
+      "order": 660,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 856541,
+      "cpu_ns": 857000
+    },
+    {
+      "order": 661,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 876250,
+      "cpu_ns": 876000
+    },
+    {
+      "order": 662,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 873833,
+      "cpu_ns": 874000
+    },
+    {
+      "order": 663,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 857708,
+      "cpu_ns": 858000
+    },
+    {
+      "order": 664,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95584,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 665,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 98667,
+      "cpu_ns": 99000
+    },
+    {
+      "order": 666,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 97792,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 667,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92750,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 668,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87625,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 669,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82542,
+      "cpu_ns": 83000
+    },
+    {
+      "order": 670,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 81167,
+      "cpu_ns": 81000
+    },
+    {
+      "order": 671,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87041,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 672,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87167,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 673,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 80334,
+      "cpu_ns": 80000
+    },
+    {
+      "order": 674,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 80125,
+      "cpu_ns": 80000
+    },
+    {
+      "order": 675,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 86167,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 676,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1054291,
+      "cpu_ns": 1054000
+    },
+    {
+      "order": 677,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 565208,
+      "cpu_ns": 566000
+    },
+    {
+      "order": 678,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 561083,
+      "cpu_ns": 561000
+    },
+    {
+      "order": 679,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1068584,
+      "cpu_ns": 1058000
+    },
+    {
+      "order": 680,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16611500,
+      "cpu_ns": 16597000
+    },
+    {
+      "order": 681,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115927084,
+      "cpu_ns": 115721000
+    },
+    {
+      "order": 682,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116352667,
+      "cpu_ns": 115899000
+    },
+    {
+      "order": 683,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16474584,
+      "cpu_ns": 16406000
+    },
+    {
+      "order": 684,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 97875,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 685,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 88042,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 686,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82125,
+      "cpu_ns": 84000
+    },
+    {
+      "order": 687,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 88667,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 688,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 856917,
+      "cpu_ns": 857000
+    },
+    {
+      "order": 689,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 877875,
+      "cpu_ns": 878000
+    },
+    {
+      "order": 690,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 877875,
+      "cpu_ns": 878000
+    },
+    {
+      "order": 691,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 854625,
+      "cpu_ns": 855000
+    },
+    {
+      "order": 692,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 73083,
+      "cpu_ns": 73000
+    },
+    {
+      "order": 693,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 94833,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 694,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 94583,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 695,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 70750,
+      "cpu_ns": 71000
+    },
+    {
+      "order": 696,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1014250,
+      "cpu_ns": 1014000
+    },
+    {
+      "order": 697,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 924500,
+      "cpu_ns": 924000
+    },
+    {
+      "order": 698,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 955333,
+      "cpu_ns": 944000
+    },
+    {
+      "order": 699,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1016208,
+      "cpu_ns": 1016000
+    },
+    {
+      "order": 700,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 568541,
+      "cpu_ns": 569000
+    },
+    {
+      "order": 701,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1077750,
+      "cpu_ns": 1078000
+    },
+    {
+      "order": 702,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1075917,
+      "cpu_ns": 1076000
+    },
+    {
+      "order": 703,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 568500,
+      "cpu_ns": 569000
+    },
+    {
+      "order": 704,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 98167,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 705,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93833,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 706,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92125,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 707,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96792,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 708,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 931875,
+      "cpu_ns": 932000
+    },
+    {
+      "order": 709,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1024625,
+      "cpu_ns": 1025000
+    },
+    {
+      "order": 710,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1028125,
+      "cpu_ns": 1028000
+    },
+    {
+      "order": 711,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 923667,
+      "cpu_ns": 924000
+    },
+    {
+      "order": 712,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1102667,
+      "cpu_ns": 1084000
+    },
+    {
+      "order": 713,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 559375,
+      "cpu_ns": 560000
+    },
+    {
+      "order": 714,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 557292,
+      "cpu_ns": 557000
+    },
+    {
+      "order": 715,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1055459,
+      "cpu_ns": 1055000
+    },
+    {
+      "order": 716,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1473958,
+      "cpu_ns": 1474000
+    },
+    {
+      "order": 717,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11497250,
+      "cpu_ns": 11490000
+    },
+    {
+      "order": 718,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11614208,
+      "cpu_ns": 11602000
+    },
+    {
+      "order": 719,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1473458,
+      "cpu_ns": 1474000
+    },
+    {
+      "order": 720,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96792,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 721,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92667,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 722,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91834,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 723,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96375,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 724,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 945834,
+      "cpu_ns": 934000
+    },
+    {
+      "order": 725,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1012459,
+      "cpu_ns": 1013000
+    },
+    {
+      "order": 726,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1010750,
+      "cpu_ns": 1011000
+    },
+    {
+      "order": 727,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 921167,
+      "cpu_ns": 921000
+    },
+    {
+      "order": 728,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 97833,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 729,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 69625,
+      "cpu_ns": 71000
+    },
+    {
+      "order": 730,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 67125,
+      "cpu_ns": 67000
+    },
+    {
+      "order": 731,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96958,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 732,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87291,
+      "cpu_ns": 88000
+    },
+    {
+      "order": 733,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 81958,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 734,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 80708,
+      "cpu_ns": 81000
+    },
+    {
+      "order": 735,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 86334,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 736,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91333,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 737,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96000,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 738,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 95334,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 739,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91250,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 740,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115877625,
+      "cpu_ns": 115675000
+    },
+    {
+      "order": 741,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16501458,
+      "cpu_ns": 16490000
+    },
+    {
+      "order": 742,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16607042,
+      "cpu_ns": 16555000
+    },
+    {
+      "order": 743,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115532416,
+      "cpu_ns": 115315000
+    },
+    {
+      "order": 744,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16653375,
+      "cpu_ns": 16626000
+    },
+    {
+      "order": 745,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 114878625,
+      "cpu_ns": 114632000
+    },
+    {
+      "order": 746,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116508292,
+      "cpu_ns": 116085000
+    },
+    {
+      "order": 747,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17487792,
+      "cpu_ns": 17474000
+    },
+    {
+      "order": 748,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 574792,
+      "cpu_ns": 575000
+    },
+    {
+      "order": 749,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1145250,
+      "cpu_ns": 1146000
+    },
+    {
+      "order": 750,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1143750,
+      "cpu_ns": 1144000
+    },
+    {
+      "order": 751,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 566875,
+      "cpu_ns": 567000
+    },
+    {
+      "order": 752,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 71666,
+      "cpu_ns": 73000
+    },
+    {
+      "order": 753,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 104458,
+      "cpu_ns": 104000
+    },
+    {
+      "order": 754,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 102375,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 755,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 67542,
+      "cpu_ns": 69000
+    },
+    {
+      "order": 756,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 103250,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 757,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95167,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 758,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92709,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 759,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 100667,
+      "cpu_ns": 101000
+    },
+    {
+      "order": 760,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9539125,
+      "cpu_ns": 9521000
+    },
+    {
+      "order": 761,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11511459,
+      "cpu_ns": 11492000
+    },
+    {
+      "order": 762,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10789292,
+      "cpu_ns": 10780000
+    },
+    {
+      "order": 763,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9367958,
+      "cpu_ns": 9368000
+    },
+    {
+      "order": 764,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1182750,
+      "cpu_ns": 1174000
+    },
+    {
+      "order": 765,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 140542,
+      "cpu_ns": 142000
+    },
+    {
+      "order": 766,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 134542,
+      "cpu_ns": 135000
+    },
+    {
+      "order": 767,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1148541,
+      "cpu_ns": 1149000
+    },
+    {
+      "order": 768,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96833,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 769,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 91459,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 770,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90542,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 771,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 95292,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 772,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8900458,
+      "cpu_ns": 8892000
+    },
+    {
+      "order": 773,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 8989292,
+      "cpu_ns": 8984000
+    },
+    {
+      "order": 774,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 8905500,
+      "cpu_ns": 8905000
+    },
+    {
+      "order": 775,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8934292,
+      "cpu_ns": 8924000
+    },
+    {
+      "order": 776,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9471083,
+      "cpu_ns": 9460000
+    },
+    {
+      "order": 777,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11583417,
+      "cpu_ns": 11569000
+    },
+    {
+      "order": 778,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11555334,
+      "cpu_ns": 11534000
+    },
+    {
+      "order": 779,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9491834,
+      "cpu_ns": 9481000
+    },
+    {
+      "order": 780,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 91000,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 781,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92291,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 782,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87041,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 783,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 84500,
+      "cpu_ns": 85000
+    },
+    {
+      "order": 784,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9331083,
+      "cpu_ns": 9320000
+    },
+    {
+      "order": 785,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8987500,
+      "cpu_ns": 8988000
+    },
+    {
+      "order": 786,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 8968333,
+      "cpu_ns": 8955000
+    },
+    {
+      "order": 787,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9043042,
+      "cpu_ns": 9030000
+    },
+    {
+      "order": 788,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 100750,
+      "cpu_ns": 101000
+    },
+    {
+      "order": 789,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 76750,
+      "cpu_ns": 77000
+    },
+    {
+      "order": 790,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "new",
+      "wall_ns": 74416,
+      "cpu_ns": 74000
+    },
+    {
+      "order": 791,
+      "input": "1000 cells x 8 col-delims, single row, no row-delim (4889 B)",
+      "side": "old",
+      "wall_ns": 96708,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 792,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1469000,
+      "cpu_ns": 1469000
+    },
+    {
+      "order": 793,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11571417,
+      "cpu_ns": 11554000
+    },
+    {
+      "order": 794,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11576125,
+      "cpu_ns": 11566000
+    },
+    {
+      "order": 795,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1469416,
+      "cpu_ns": 1471000
+    },
+    {
+      "order": 796,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16381750,
+      "cpu_ns": 16370000
+    },
+    {
+      "order": 797,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115808792,
+      "cpu_ns": 115695000
+    },
+    {
+      "order": 798,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116301500,
+      "cpu_ns": 116001000
+    },
+    {
+      "order": 799,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17023417,
+      "cpu_ns": 17012000
+    },
+    {
+      "order": 800,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 142125,
+      "cpu_ns": 142000
+    },
+    {
+      "order": 801,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1180750,
+      "cpu_ns": 1170000
+    },
+    {
+      "order": 802,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1103958,
+      "cpu_ns": 1104000
+    },
+    {
+      "order": 803,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 140875,
+      "cpu_ns": 141000
+    },
+    {
+      "order": 804,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1154042,
+      "cpu_ns": 1155000
+    },
+    {
+      "order": 805,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 143708,
+      "cpu_ns": 144000
+    },
+    {
+      "order": 806,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 144292,
+      "cpu_ns": 144000
+    },
+    {
+      "order": 807,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1155834,
+      "cpu_ns": 1156000
+    },
+    {
+      "order": 808,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1163000,
+      "cpu_ns": 1164000
+    },
+    {
+      "order": 809,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 144459,
+      "cpu_ns": 144000
+    },
+    {
+      "order": 810,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 144208,
+      "cpu_ns": 145000
+    },
+    {
+      "order": 811,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1162167,
+      "cpu_ns": 1162000
+    },
+    {
+      "order": 812,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9605041,
+      "cpu_ns": 9581000
+    },
+    {
+      "order": 813,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11218292,
+      "cpu_ns": 11206000
+    },
+    {
+      "order": 814,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 10947208,
+      "cpu_ns": 10936000
+    },
+    {
+      "order": 815,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9653583,
+      "cpu_ns": 9603000
+    },
+    {
+      "order": 816,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92542,
+      "cpu_ns": 93000
+    },
+    {
+      "order": 817,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 87458,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 818,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 81000,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 819,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87250,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 820,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 135458,
+      "cpu_ns": 136000
+    },
+    {
+      "order": 821,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1150958,
+      "cpu_ns": 1151000
+    },
+    {
+      "order": 822,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1156958,
+      "cpu_ns": 1141000
+    },
+    {
+      "order": 823,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 131166,
+      "cpu_ns": 131000
+    },
+    {
+      "order": 824,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11457875,
+      "cpu_ns": 11451000
+    },
+    {
+      "order": 825,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1477125,
+      "cpu_ns": 1478000
+    },
+    {
+      "order": 826,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1463625,
+      "cpu_ns": 1464000
+    },
+    {
+      "order": 827,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11535375,
+      "cpu_ns": 11530000
+    },
+    {
+      "order": 828,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 855792,
+      "cpu_ns": 856000
+    },
+    {
+      "order": 829,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 871167,
+      "cpu_ns": 872000
+    },
+    {
+      "order": 830,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 889292,
+      "cpu_ns": 879000
+    },
+    {
+      "order": 831,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 860250,
+      "cpu_ns": 852000
+    },
+    {
+      "order": 832,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1147583,
+      "cpu_ns": 1148000
+    },
+    {
+      "order": 833,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 136250,
+      "cpu_ns": 137000
+    },
+    {
+      "order": 834,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 135083,
+      "cpu_ns": 135000
+    },
+    {
+      "order": 835,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1159625,
+      "cpu_ns": 1159000
+    },
+    {
+      "order": 836,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 81541,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 837,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 87833,
+      "cpu_ns": 89000
+    },
+    {
+      "order": 838,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 86292,
+      "cpu_ns": 87000
+    },
+    {
+      "order": 839,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 80791,
+      "cpu_ns": 81000
+    },
+    {
+      "order": 840,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96083,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 841,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93125,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 842,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 90917,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 843,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 96083,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 844,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1059458,
+      "cpu_ns": 1059000
+    },
+    {
+      "order": 845,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 557583,
+      "cpu_ns": 557000
+    },
+    {
+      "order": 846,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 556458,
+      "cpu_ns": 557000
+    },
+    {
+      "order": 847,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1054833,
+      "cpu_ns": 1056000
+    },
+    {
+      "order": 848,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16472042,
+      "cpu_ns": 16453000
+    },
+    {
+      "order": 849,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116319667,
+      "cpu_ns": 116090000
+    },
+    {
+      "order": 850,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115745292,
+      "cpu_ns": 115543000
+    },
+    {
+      "order": 851,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17800292,
+      "cpu_ns": 17734000
+    },
+    {
+      "order": 852,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9586708,
+      "cpu_ns": 9575000
+    },
+    {
+      "order": 853,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11614917,
+      "cpu_ns": 11605000
+    },
+    {
+      "order": 854,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11539958,
+      "cpu_ns": 11530000
+    },
+    {
+      "order": 855,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9546625,
+      "cpu_ns": 9532000
+    },
+    {
+      "order": 856,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1583334,
+      "cpu_ns": 1584000
+    },
+    {
+      "order": 857,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11500042,
+      "cpu_ns": 11489000
+    },
+    {
+      "order": 858,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11673042,
+      "cpu_ns": 11600000
+    },
+    {
+      "order": 859,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1458000,
+      "cpu_ns": 1459000
+    },
+    {
+      "order": 860,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11437750,
+      "cpu_ns": 11414000
+    },
+    {
+      "order": 861,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1491250,
+      "cpu_ns": 1491000
+    },
+    {
+      "order": 862,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1492750,
+      "cpu_ns": 1493000
+    },
+    {
+      "order": 863,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11571958,
+      "cpu_ns": 11559000
+    },
+    {
+      "order": 864,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 100458,
+      "cpu_ns": 100000
+    },
+    {
+      "order": 865,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 93917,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 866,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 92375,
+      "cpu_ns": 92000
+    },
+    {
+      "order": 867,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 97625,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 868,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12343583,
+      "cpu_ns": 12312000
+    },
+    {
+      "order": 869,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5726958,
+      "cpu_ns": 5728000
+    },
+    {
+      "order": 870,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5993792,
+      "cpu_ns": 5954000
+    },
+    {
+      "order": 871,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13445375,
+      "cpu_ns": 13351000
+    },
+    {
+      "order": 872,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 909250,
+      "cpu_ns": 909000
+    },
+    {
+      "order": 873,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 901000,
+      "cpu_ns": 901000
+    },
+    {
+      "order": 874,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 887416,
+      "cpu_ns": 889000
+    },
+    {
+      "order": 875,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 886000,
+      "cpu_ns": 886000
+    },
+    {
+      "order": 876,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 610000,
+      "cpu_ns": 599000
+    },
+    {
+      "order": 877,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1184875,
+      "cpu_ns": 1186000
+    },
+    {
+      "order": 878,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1179709,
+      "cpu_ns": 1180000
+    },
+    {
+      "order": 879,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 590209,
+      "cpu_ns": 590000
+    },
+    {
+      "order": 880,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 18151125,
+      "cpu_ns": 18118000
+    },
+    {
+      "order": 881,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 116603167,
+      "cpu_ns": 116437000
+    },
+    {
+      "order": 882,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115788042,
+      "cpu_ns": 115549000
+    },
+    {
+      "order": 883,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 17550209,
+      "cpu_ns": 17526000
+    },
+    {
+      "order": 884,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11575291,
+      "cpu_ns": 11564000
+    },
+    {
+      "order": 885,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9895500,
+      "cpu_ns": 9845000
+    },
+    {
+      "order": 886,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9654417,
+      "cpu_ns": 9644000
+    },
+    {
+      "order": 887,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 12441542,
+      "cpu_ns": 12425000
+    },
+    {
+      "order": 888,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5840625,
+      "cpu_ns": 5829000
+    },
+    {
+      "order": 889,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 13280875,
+      "cpu_ns": 13270000
+    },
+    {
+      "order": 890,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "old",
+      "wall_ns": 12373209,
+      "cpu_ns": 12354000
+    },
+    {
+      "order": 891,
+      "input": "100000 cells x 8 col-delims, single row, no row-delim (688889 B)",
+      "side": "new",
+      "wall_ns": 5839709,
+      "cpu_ns": 5823000
+    },
+    {
+      "order": 892,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 105750,
+      "cpu_ns": 106000
+    },
+    {
+      "order": 893,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 97250,
+      "cpu_ns": 98000
+    },
+    {
+      "order": 894,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 94125,
+      "cpu_ns": 94000
+    },
+    {
+      "order": 895,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 98541,
+      "cpu_ns": 99000
+    },
+    {
+      "order": 896,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9311125,
+      "cpu_ns": 9248000
+    },
+    {
+      "order": 897,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9223666,
+      "cpu_ns": 9207000
+    },
+    {
+      "order": 898,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9098042,
+      "cpu_ns": 9075000
+    },
+    {
+      "order": 899,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9170208,
+      "cpu_ns": 9170000
+    },
+    {
+      "order": 900,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95750,
+      "cpu_ns": 96000
+    },
+    {
+      "order": 901,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 86000,
+      "cpu_ns": 86000
+    },
+    {
+      "order": 902,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 82375,
+      "cpu_ns": 82000
+    },
+    {
+      "order": 903,
+      "input": "1000 cells x 1 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 89334,
+      "cpu_ns": 91000
+    },
+    {
+      "order": 904,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11651333,
+      "cpu_ns": 11633000
+    },
+    {
+      "order": 905,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1515750,
+      "cpu_ns": 1516000
+    },
+    {
+      "order": 906,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1498708,
+      "cpu_ns": 1499000
+    },
+    {
+      "order": 907,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11795917,
+      "cpu_ns": 11710000
+    },
+    {
+      "order": 908,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1182959,
+      "cpu_ns": 1183000
+    },
+    {
+      "order": 909,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 574958,
+      "cpu_ns": 576000
+    },
+    {
+      "order": 910,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "new",
+      "wall_ns": 571958,
+      "cpu_ns": 572000
+    },
+    {
+      "order": 911,
+      "input": "10000 cells x 8 col-delims, single row, no row-delim (58889 B)",
+      "side": "old",
+      "wall_ns": 1173208,
+      "cpu_ns": 1173000
+    },
+    {
+      "order": 912,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9055792,
+      "cpu_ns": 9048000
+    },
+    {
+      "order": 913,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9535916,
+      "cpu_ns": 9473000
+    },
+    {
+      "order": 914,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9375833,
+      "cpu_ns": 9368000
+    },
+    {
+      "order": 915,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9119292,
+      "cpu_ns": 9101000
+    },
+    {
+      "order": 916,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115284583,
+      "cpu_ns": 114874000
+    },
+    {
+      "order": 917,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 15945292,
+      "cpu_ns": 15897000
+    },
+    {
+      "order": 918,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 16489250,
+      "cpu_ns": 16465000
+    },
+    {
+      "order": 919,
+      "input": "100000 cells x 8 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 115119958,
+      "cpu_ns": 114893000
+    },
+    {
+      "order": 920,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 961834,
+      "cpu_ns": 950000
+    },
+    {
+      "order": 921,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1063916,
+      "cpu_ns": 1064000
+    },
+    {
+      "order": 922,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1055375,
+      "cpu_ns": 1056000
+    },
+    {
+      "order": 923,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 915333,
+      "cpu_ns": 915000
+    },
+    {
+      "order": 924,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9560791,
+      "cpu_ns": 9506000
+    },
+    {
+      "order": 925,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11414541,
+      "cpu_ns": 11401000
+    },
+    {
+      "order": 926,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 11114917,
+      "cpu_ns": 11103000
+    },
+    {
+      "order": 927,
+      "input": "100000 cells x 3 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9518542,
+      "cpu_ns": 9503000
+    },
+    {
+      "order": 928,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 929542,
+      "cpu_ns": 930000
+    },
+    {
+      "order": 929,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1040500,
+      "cpu_ns": 1041000
+    },
+    {
+      "order": 930,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1028042,
+      "cpu_ns": 1028000
+    },
+    {
+      "order": 931,
+      "input": "10000 cells x 3 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 920166,
+      "cpu_ns": 920000
+    },
+    {
+      "order": 932,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1527792,
+      "cpu_ns": 1519000
+    },
+    {
+      "order": 933,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11457583,
+      "cpu_ns": 11444000
+    },
+    {
+      "order": 934,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11469292,
+      "cpu_ns": 11459000
+    },
+    {
+      "order": 935,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1455333,
+      "cpu_ns": 1456000
+    },
+    {
+      "order": 936,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1449833,
+      "cpu_ns": 1450000
+    },
+    {
+      "order": 937,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11460334,
+      "cpu_ns": 11410000
+    },
+    {
+      "order": 938,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 11496917,
+      "cpu_ns": 11476000
+    },
+    {
+      "order": 939,
+      "input": "10000 cells x 8 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 1633000,
+      "cpu_ns": 1625000
+    },
+    {
+      "order": 940,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1142125,
+      "cpu_ns": 1142000
+    },
+    {
+      "order": 941,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 148583,
+      "cpu_ns": 149000
+    },
+    {
+      "order": 942,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 145875,
+      "cpu_ns": 146000
+    },
+    {
+      "order": 943,
+      "input": "1000 cells x 8 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 1140709,
+      "cpu_ns": 1141000
+    },
+    {
+      "order": 944,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9034417,
+      "cpu_ns": 9025000
+    },
+    {
+      "order": 945,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9298042,
+      "cpu_ns": 9286000
+    },
+    {
+      "order": 946,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "old",
+      "wall_ns": 9357166,
+      "cpu_ns": 9342000
+    },
+    {
+      "order": 947,
+      "input": "100000 cells x 1 col-delims (688889 B)",
+      "side": "new",
+      "wall_ns": 9259875,
+      "cpu_ns": 9247000
+    },
+    {
+      "order": 948,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 940917,
+      "cpu_ns": 941000
+    },
+    {
+      "order": 949,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 933834,
+      "cpu_ns": 934000
+    },
+    {
+      "order": 950,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "old",
+      "wall_ns": 913417,
+      "cpu_ns": 914000
+    },
+    {
+      "order": 951,
+      "input": "10000 cells x 1 col-delims (58889 B)",
+      "side": "new",
+      "wall_ns": 914000,
+      "cpu_ns": 914000
+    },
+    {
+      "order": 952,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 100041,
+      "cpu_ns": 101000
+    },
+    {
+      "order": 953,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 106500,
+      "cpu_ns": 107000
+    },
+    {
+      "order": 954,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 104541,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 955,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 96917,
+      "cpu_ns": 97000
+    },
+    {
+      "order": 956,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95208,
+      "cpu_ns": 95000
+    },
+    {
+      "order": 957,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 104250,
+      "cpu_ns": 105000
+    },
+    {
+      "order": 958,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "old",
+      "wall_ns": 103459,
+      "cpu_ns": 103000
+    },
+    {
+      "order": 959,
+      "input": "1000 cells x 3 col-delims (4889 B)",
+      "side": "new",
+      "wall_ns": 95625,
+      "cpu_ns": 96000
+    }
+  ]
+}

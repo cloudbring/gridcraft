@@ -1,0 +1,22 @@
+# Standalone workspace (not a member of the gridcraft workspace): re-measure harness for
+# artcraft-algorithms#192 claim "gridcraft TEXTSPLIT 7.8x" (#57).
+[workspace]
+
+[package]
+name = "perf-remeasure"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+# NEW: branch algo/57-textsplit-matcher, 02443015, by path.
+gridcraft-functions = { path = "../../crates/functions" }
+gridcraft-core = { path = "../../crates/core" }
+# OLD: merge-base with origin/main, renamed git dependencies.
+gridcraft-functions-old = { package = "gridcraft-functions", git = "https://github.com/storytold/gridcraft", rev = "85e51e009c24fad47575f04d3c08f12342615d82" }
+gridcraft-core-old = { package = "gridcraft-core", git = "https://github.com/storytold/gridcraft", rev = "85e51e009c24fad47575f04d3c08f12342615d82" }
+# Paired harness, craft-libs algo/integration, ticket #189.
+craft-bench = { git = "https://github.com/cloudbring/craft-libs", rev = "94c6d76e5bc2c936d3db5ce5e19d70213e8390c0" }
+
+[profile.release]
+debug = false

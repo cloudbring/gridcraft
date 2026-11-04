@@ -21,7 +21,7 @@ gridcraft-model = { workspace = true }
 thiserror = { workspace = true }
 quick-xml = { workspace = true }
 zip = { workspace = true }
-craft-ooxml = { git = "https://github.com/cloudbring/craft-libs", rev = "fbceacb" }
+craft-ooxml = { git = "https://github.com/cloudbring/craft-libs", rev = "7d46713" }
 aes = { workspace = true }
 sha1 = { workspace = true }
 sha2 = { workspace = true }

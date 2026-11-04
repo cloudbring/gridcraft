@@ -4,7 +4,8 @@ Ticket: cloudbring/artcraft-algorithms#184 (gridcraft part). Evidence standard:
 research/VERIFICATION.md section 1.1 (refactor or shared-crate swap).
 
 - OLD: `gridcraft-xlsx` at `014f030a15d586ddc0ff5d775fa51991cabb8907` (merge-base, before #122).
-- NEW: `gridcraft-xlsx` at `fb4a0354` (the LazyPackage adapter) plus the fix below.
+- NEW: `gridcraft-xlsx` at `fb4a0354` (the LazyPackage adapter), with craft-ooxml re-pinned from `fbceacb`
+  to craft-libs `7d46713` and the tolerance switches on (`LazyLimits::lenient()`). First run: `fbceacb`.
 - Harness: `tools/ooxml-oracle` (craft-oracle `Differential` + craft-compare, craft-libs rev `313fbe2`),
   expected differences in `tools/ooxml-oracle/expected.toml`.
 
@@ -47,57 +48,44 @@ a Regression unless an `expected.toml` entry covers it.
 
 984 `.xlsx` + 29 `.xlsm` = 1013 workbooks (no `.ods` in the corpus).
 
-| Corpus | Files | Identical | Expected difference | Both fail | Regression |
-|---|---:|---:|---:|---:|---:|
-| office-poi | 347 | 342 | 2 | 3 | 0 |
-| office-openxml-sdk | 101 | 101 | 0 | 0 | 0 |
-| office-libreoffice | 565 | 562 | 2 | 1 | 0 |
-| **Total** | **1013** | **1005** | **4** | **4** | **0** |
+| Run | Identical | Expected | Both fail | Regression / only-new-fails |
+|---|---:|---:|---:|---:|
+| Before: craft-ooxml `fbceacb`, as swapped | 1004 | 0 | 4 | 2 / 3 |
+| After the case-variant adapter fix | 1005 | 4 registered | 4 | 0 |
+| After: craft-ooxml `7d46713`, tolerance on | **1009** | **0** | **4** | **0** |
 
-No panics, timeouts, only-old-fails or only-new-fails remain after the expected entries. Before
-the fix and the registrations the same run gave 1004 identical, 2 regressions, 3 only-new-fails,
-4 both-fail.
+Final, per corpus: office-poi 344 identical + 3 both-fail (347); office-openxml-sdk 101 identical;
+office-libreoffice 564 identical + 1 both-fail (565). `expected.toml` is empty. No panics or
+timeouts. The 4 both-fail files are rejected by both sides.
 
 Not covered: password-encrypted and `.xls`/`.xlsb` inputs, which the engine routes before
 `read_xlsx` (three `Could not find EOCD` both-fail files are encrypted containers).
 
-## Differences
+## Differences found, and how each ended
 
-### Fixed: case-variant duplicate entries (1 file, was a Regression)
+### Case-variant duplicate entries (1 file): fixed upstream
 
-`office-poi/spreadsheet/duplicate-filename-case-insensitive.xlsx` holds `xl/worksheets/sheet1.xml`
-and `xl/worksheets/Sheet1.xml`. The relationship targets `worksheets/sheet1.xml`. Old read the
-exactly spelled entry (`v1`); new read `v2`. Root cause: `LazyPackage` keeps a sorted map and
-`find` is a case-insensitive scan, so the spelling that sorts first (`Sheet1.xml`) shadows the one
-requested. Fix in `Package::stored` (`crates/xlsx/src/package.rs`): an exact-spelled entry wins,
-then the case-insensitive lookup. Regression test:
-`package::tests::a_case_variant_entry_does_not_shadow_the_exact_one`. After the fix the file is
-byte-identical on both sides.
+`duplicate-filename-case-insensitive.xlsx` holds `sheet1.xml` and `Sheet1.xml`; the target is
+`sheet1.xml`. craft-ooxml's sorted index let `Sheet1.xml` win, so new read `v2` where old read
+`v1`. I first fixed it in the adapter (`Package::stored`); craft-libs `7d46713` now prefers the
+exact-case entry in `LazyPackage::find`, and I confirmed the adapter branch is redundant (the
+test and the corpus run pass without it) and removed it. The regression test
+`package::tests::a_case_variant_entry_does_not_shadow_the_exact_one` stays.
 
-### Registered: backslash entry names (3 files, only-new-fails)
+### Backslash entry names (3 files): fixed upstream
 
-`office-poi/spreadsheet/49609.xlsx`, `office-libreoffice/sc/qa/unit/data/xlsx/tdf131575.xlsx`,
-`.../tdf76115.xlsx` name their zip entries `xl\workbook.xml`, `[content_types].xml`, ... Old
-normalised stored names (`\` to `/`, lower case) and opened them. NEW fails with "no workbook
-part": `LazyPackage` indexes the raw name, so no lookup finds it (the adapter's
-`part.replace('\\', "/")` is applied to the request, not to the stored names; craft-ooxml's
-`checked_part` treats a backslash as an unsafe name). The ticket lists this change as intended.
-Finding: it costs 3 of 1013 real files (0.3%), all written by real producers (the LibreOffice two
-are bug-report files for exactly this). Recommendation: reverse in craft-ooxml with a lenient name
-mapping in `LazyPackage::open_with` (index `\` as `/` and let `rels_of` and the content-types read
-use it); the adapter alone cannot, because `rels_of` and the content-types read are inside
-craft-ooxml. Left registered, not fixed, because it needs a craft-libs change.
+`49609.xlsx`, `tdf131575.xlsx`, `tdf76115.xlsx` name entries `xl\workbook.xml`,
+`[content_types].xml`. Old normalised stored names and opened them; the swap failed with "no
+workbook part". `7d46713` adds `LazyLimits::normalize_backslash_names` (and a case-insensitive
+`[Content_Types].xml` lookup); the adapter now uses `LazyLimits::lenient()`. All three open and
+are byte-identical to old, so the ticket's "backslash names rejected" change is reversed for
+the lazy reader.
 
-### Registered: DOCTYPE in `[Content_Types].xml` (1 file, semantic section differs)
+### DOCTYPE in `[Content_Types].xml` (1 file): fixed upstream
 
-`office-poi/spreadsheet/54764-2.xlsx` (POI bug 54764, an entity-expansion file) declares entities
-in `[Content_Types].xml`. craft-ooxml's XML reader refuses any DTD, so the content types read as
-empty and the passthrough of unmodelled parts is switched off (`KeptReader::new`). The model and
-every modelled section are identical; the difference is `workbook.preserved` (old kept the
-`fileVersion` element, new has none), so the saved `xl/workbook.xml` loses
-`<fileVersion appName="xl" .../>`. Not on the ticket's list. Accepted: DTD refusal is a hardening
-decision and the cost is limited to attributes Excel regenerates. The adapter drops the package
-warning (`LazyPackage::warnings` is not surfaced), so the user is not told.
+`54764-2.xlsx` (entity expansion) lost its `fileVersion` element on save because the DTD made the
+content types read as empty. `7d46713`'s `lenient_content_types` skips the DOCTYPE without
+expanding entities; the file is now identical to old.
 
 ### Both-fail files with different error text (4 files)
 
@@ -126,7 +114,6 @@ more than the part limit (`oversized_part` agrees old/new on all 1013).
 
 ## Evidence level
 
-L3 for the reader swap on open and open-then-save over 1013 real workbooks: 1005 identical, 4
-registered (1 bounded fidelity loss, 3 open failures to reverse upstream), 0 unexplained. The
-backslash finding means the claim "behaviour unchanged" does not hold until it is reversed in
-craft-ooxml or the loss is accepted.
+L3 for the reader swap on open and open-then-save over 1013 real workbooks: 1009 identical to the
+byte, 4 rejected by both sides, 0 unexplained and nothing registered. The "known changes" the
+corpus does not exercise (above) stay at the level shown there.

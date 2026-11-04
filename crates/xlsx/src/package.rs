@@ -56,9 +56,13 @@ pub fn normalize(name: &str) -> String {
 
 impl<'a> Package<'a> {
     pub fn open(bytes: &'a [u8]) -> Result<Package<'a>, IoError> {
-        LazyPackage::open_with(bytes, &limits(), LazyLimits { charge_failed_reads_full_cap: true, no_expansion_ratio_guard: true })
-            .map(|pkg| Package { pkg })
-            .map_err(io_error)
+        LazyPackage::open_with(
+            bytes,
+            &limits(),
+            LazyLimits { charge_failed_reads_full_cap: true, no_expansion_ratio_guard: true, ..LazyLimits::lenient() },
+        )
+        .map(|pkg| Package { pkg })
+        .map_err(io_error)
     }
 
     /// The package's parsed `[Content_Types].xml` (empty when missing or unparseable).
@@ -70,15 +74,8 @@ impl<'a> Package<'a> {
         self.stored(part).is_some()
     }
 
-    /// The archive's spelling of `part`. An entry spelled exactly like the request wins over a
-    /// case-variant of it (`xl/worksheets/sheet1.xml` next to `Sheet1.xml`): the index is sorted,
-    /// so the case-insensitive lookup alone would pick whichever spelling sorts first.
     fn stored(&self, part: &str) -> Option<String> {
         let part = part.replace('\\', "/");
-        let exact = part.trim_start_matches('/');
-        if self.pkg.declared_size(exact).is_some() {
-            return Some(exact.to_string());
-        }
         self.pkg.find(&part).map(str::to_string)
     }
 

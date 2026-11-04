@@ -185,9 +185,9 @@ dependencies = [
 [[package]]
 name = "craft-archive"
 version = "0.1.0"
-source = "git+https://github.com/cloudbring/craft-libs?rev=fbceacb#fbceacb4a98cdb42346d50cfa546daca9d3aa7d3"
+source = "git+https://github.com/cloudbring/craft-libs?rev=7d46713#7d46713fad25280dc1a3f28e9f68fefa89aa0805"
 dependencies = [
- "craft-hash 0.1.0 (git+https://github.com/cloudbring/craft-libs?rev=fbceacb)",
+ "craft-hash 0.1.0 (git+https://github.com/cloudbring/craft-libs?rev=7d46713)",
  "flate2",
  "thiserror 2.0.21",
  "zip 9.1.0",
@@ -222,7 +222,7 @@ dependencies = [
 [[package]]
 name = "craft-hash"
 version = "0.1.0"
-source = "git+https://github.com/cloudbring/craft-libs?rev=fbceacb#fbceacb4a98cdb42346d50cfa546daca9d3aa7d3"
+source = "git+https://github.com/cloudbring/craft-libs?rev=7d46713#7d46713fad25280dc1a3f28e9f68fefa89aa0805"
 dependencies = [
  "sha2 0.10.9",
 ]
@@ -230,7 +230,7 @@ dependencies = [
 [[package]]
 name = "craft-ooxml"
 version = "0.1.0"
-source = "git+https://github.com/cloudbring/craft-libs?rev=fbceacb#fbceacb4a98cdb42346d50cfa546daca9d3aa7d3"
+source = "git+https://github.com/cloudbring/craft-libs?rev=7d46713#7d46713fad25280dc1a3f28e9f68fefa89aa0805"
 dependencies = [
  "craft-archive",
  "quick-xml",

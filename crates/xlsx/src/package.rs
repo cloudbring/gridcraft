@@ -70,8 +70,16 @@ impl<'a> Package<'a> {
         self.stored(part).is_some()
     }
 
+    /// The archive's spelling of `part`. An entry spelled exactly like the request wins over a
+    /// case-variant of it (`xl/worksheets/sheet1.xml` next to `Sheet1.xml`): the index is sorted,
+    /// so the case-insensitive lookup alone would pick whichever spelling sorts first.
     fn stored(&self, part: &str) -> Option<String> {
-        self.pkg.find(&part.replace('\\', "/")).map(str::to_string)
+        let part = part.replace('\\', "/");
+        let exact = part.trim_start_matches('/');
+        if self.pkg.declared_size(exact).is_some() {
+            return Some(exact.to_string());
+        }
+        self.pkg.find(&part).map(str::to_string)
     }
 
     /// Reads a part's bytes; `Ok(None)` when it doesn't exist.
@@ -201,6 +209,17 @@ mod tests {
         assert_eq!(resolve("a", "../../../x"), "x");
         assert_eq!(split_dir("xl/workbook.xml"), ("xl", "workbook.xml"));
         assert_eq!(split_dir("x.xml"), ("", "x.xml"));
+    }
+
+    /// Two entries whose names differ only in case: the one spelled like the request is read, as
+    /// before the swap to craft-ooxml (whose sorted index put `Sheet1.xml` ahead of `sheet1.xml`).
+    #[test]
+    fn a_case_variant_entry_does_not_shadow_the_exact_one() {
+        let z = crate::tests::make_zip(&[("xl/worksheets/sheet1.xml", b"lower"), ("xl/worksheets/Sheet1.xml", b"upper")]);
+        let mut pkg = Package::open(&z).unwrap();
+        assert_eq!(pkg.read("xl/worksheets/sheet1.xml").unwrap().as_deref(), Some(&b"lower"[..]));
+        assert_eq!(pkg.read("xl/worksheets/Sheet1.xml").unwrap().as_deref(), Some(&b"upper"[..]));
+        assert_eq!(pkg.read("XL/worksheets/SHEET1.xml").unwrap().as_deref(), Some(&b"upper"[..]), "no exact spelling: sorted first");
     }
 
     /// An over-budget read must spend the package's allowance once and for all: loops over many

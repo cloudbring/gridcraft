@@ -1,0 +1,35 @@
+# Intended old-vs-new differences of the craft-ooxml reader swap (#122), over the Office corpus.
+# Each entry names the files it covers; an entry that matches nothing is reported as stale.
+# Root causes and counts: docs/verification/ooxml-oracle.md.
+
+# Entry names with backslashes (`xl\workbook.xml`). The old index normalised stored names
+# (`\` -> `/`); craft-ooxml's LazyPackage indexes the raw name, so the workbook part is not found
+# and the file no longer opens. Ticket #184 lists this as "backslash entry names rejected".
+[[expected]]
+id = "backslash-entry-names-49609"
+reason = "zip entries named with backslashes are no longer found (old: normalised on open): file fails with 'no workbook part'"
+evidence = "cloudbring/artcraft-algorithms#184 (known change); craft-ooxml opc.rs checked_part rejects names containing a backslash"
+glob = "office-poi/spreadsheet/49609.xlsx"
+
+[[expected]]
+id = "backslash-entry-names-tdf131575"
+reason = "zip entries named with backslashes are no longer found (old: normalised on open): file fails with 'no workbook part'"
+evidence = "cloudbring/artcraft-algorithms#184 (known change); craft-ooxml opc.rs checked_part rejects names containing a backslash"
+glob = "office-libreoffice/sc/qa/unit/data/xlsx/tdf131575.xlsx"
+
+[[expected]]
+id = "backslash-entry-names-tdf76115"
+reason = "zip entries named with backslashes are no longer found (old: normalised on open): file fails with 'no workbook part'"
+evidence = "cloudbring/artcraft-algorithms#184 (known change); craft-ooxml opc.rs checked_part rejects names containing a backslash"
+glob = "office-libreoffice/sc/qa/unit/data/xlsx/tdf76115.xlsx"
+
+# A DOCTYPE with entity declarations in [Content_Types].xml (POI's entity-expansion test file).
+# craft-ooxml's XML reader refuses DTDs ("DTD is not supported"), so the content types read as
+# empty and the passthrough of unmodelled parts is off; the old parser skipped the DOCTYPE.
+# The model is unchanged; the saved workbook.xml loses the preserved fileVersion element.
+[[expected]]
+id = "dtd-in-content-types-54764-2"
+reason = "DOCTYPE in [Content_Types].xml is refused by craft-ooxml: content types ignored, kept parts/elements (fileVersion) not preserved"
+evidence = "craft-ooxml dom.rs Event::DocType => 'DTD is not supported'; file is POI bug 54764 entity-expansion test"
+glob = "office-poi/spreadsheet/54764-2.xlsx"
+metric = "sem:workbook.preserved"

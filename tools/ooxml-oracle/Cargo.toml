@@ -1,0 +1,20 @@
+[package]
+name = "ooxml-oracle"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Old-vs-new differential for the craft-ooxml reader swap (#122) over a real-file corpus; see docs/verification/ooxml-oracle.md"
+
+# Its own workspace: the pre-swap `gridcraft-xlsx` (a git dependency of the same name as the
+# workspace crate) would make `-p gridcraft-xlsx` ambiguous for every command in the main
+# workspace (`cargo xtask wasm` among them) if it were a dev-dependency there.
+[workspace]
+
+[dependencies]
+gridcraft-xlsx = { path = "../../crates/xlsx" }
+zip = { version = "3", default-features = false, features = ["deflate"] }
+serde_json = "1"
+craft-oracle = { git = "https://github.com/cloudbring/craft-libs", rev = "313fbe2" }
+craft-compare = { git = "https://github.com/cloudbring/craft-libs", rev = "313fbe2" }
+# The reader and writer as of the swap's merge-base, renamed so both revisions link together.
+xlsx_old = { package = "gridcraft-xlsx", git = "https://github.com/storytold/gridcraft", rev = "014f030a15d586ddc0ff5d775fa51991cabb8907" }

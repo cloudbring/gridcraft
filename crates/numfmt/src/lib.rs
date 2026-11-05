@@ -287,6 +287,12 @@ impl NumberFormat {
 
     /// Formats a number. The flag is true when the value cannot be shown (date out of range).
     fn format_number(&self, n: f64, sys: DateSystem) -> (Formatted, bool) {
+        self.format_number_with(n, sys, false)
+    }
+
+    /// `elapsed_negative`: `TEXT()` shows a negative value through a format with an elapsed
+    /// `[h]`/`[m]`/`[s]` part as its magnitude with a minus sign (Excel), where a cell shows `#####`.
+    fn format_number_with(&self, n: f64, sys: DateSystem, elapsed_negative: bool) -> (Formatted, bool) {
         let general = |n: f64| Formatted {
             text: format_general_fit(n, GENERAL_WIDTH).unwrap_or_else(|| OVERFLOW.into()),
             color: None,
@@ -305,11 +311,10 @@ impl NumberFormat {
                 Some(render::render_general(sec, n.abs(), width))
             }
             SecKind::Date => {
-                if minus {
-                    None
-                } else {
-                    render::render_date(sec, n.abs(), sys)
-                }
+                let elapsed = sec.toks.iter().any(|t| {
+                    matches!(t, parse::Tok::Date(parse::DatePart::ElapsedH(_) | parse::DatePart::ElapsedM(_) | parse::DatePart::ElapsedS(_)))
+                });
+                if minus && !(elapsed_negative && elapsed) { None } else { render::render_date(sec, n.abs(), sys) }
             }
             SecKind::Number => Some(render::render_number(sec, n.abs())),
         };
@@ -447,7 +452,7 @@ pub fn text_function(v: &Value, code: &str, sys: DateSystem) -> Result<String, C
     if !n.is_finite() {
         return Err(CellError::Num);
     }
-    let (f, overflow) = fmt.format_number(n, sys);
+    let (f, overflow) = fmt.format_number_with(n, sys, true);
     if overflow { Err(CellError::Value) } else { Ok(f.text) }
 }
 

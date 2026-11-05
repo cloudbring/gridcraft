@@ -1,0 +1,64 @@
+# `gridcraft-cli check` over the verified Office corpora (recalculation against cached values, package
+# round trip), compared with baselines/xlsx-corpus.json: fails on a crash or a regression.
+#
+# Not runnable on the fork until it reaches main: GitHub reads workflows from the default branch of
+# the repository that runs them, and the corpora (craft-corpus: office-poi, office-libreoffice,
+# office-openxml-sdk) must be materialised on the runner. Until the corpus fetch step is wired to
+# craft-corpus (artcraft-algorithms#180) `GRIDCRAFT_REQUIRE_OFFICE_CORPUS` stays unset on forks and the
+# job skips; on main it is set so a missing corpus fails.
+name: XLSX corpus check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/calc/**"
+      - "crates/functions/**"
+      - "crates/formula/**"
+      - "crates/numfmt/**"
+      - "crates/xlsx/**"
+      - "crates/model/**"
+      - "crates/core/**"
+      - "apps/gridcraft-cli/**"
+      - "xtask/**"
+      - "baselines/xlsx-corpus.json"
+      - ".github/workflows/xlsx-corpus.yml"
+  pull_request:
+    paths:
+      - "crates/calc/**"
+      - "crates/functions/**"
+      - "crates/formula/**"
+      - "crates/numfmt/**"
+      - "crates/xlsx/**"
+      - "crates/model/**"
+      - "crates/core/**"
+      - "apps/gridcraft-cli/**"
+      - "xtask/**"
+      - "baselines/xlsx-corpus.json"
+      - ".github/workflows/xlsx-corpus.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: xlsx-corpus-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  corpus:
+    name: gridcraft-cli check vs baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GRIDCRAFT_OFFICE_CORPUS: ${{ github.workspace }}/../corpus
+      # Only the main repository has the corpus; forks skip instead of failing.
+      GRIDCRAFT_REQUIRE_OFFICE_CORPUS: ${{ github.repository == 'storytold/gridcraft' && '1' || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # TODO(#197): fetch the three Office corpora pinned by their .craft-corpus.json manifests into
+      # $GRIDCRAFT_OFFICE_CORPUS with craft-corpus (artcraft-algorithms#180) once it is published.
+      - name: Check the corpus against the baseline
+        run: cargo xtask check-corpus

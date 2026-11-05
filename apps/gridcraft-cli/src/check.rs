@@ -39,9 +39,9 @@ use calc::{bool_cached_as_number, values_match};
 #[cfg(test)]
 use fidelity::diff_workbooks;
 pub use fidelity::round_trip;
-use package::full_calc_on_load;
 #[cfg(test)]
 use package::validate_package;
+use package::{full_calc_on_load, producer};
 use report::print_human;
 pub use report::report_json;
 
@@ -150,6 +150,8 @@ pub struct FileReport {
     pub path: String,
     /// Opening the file or discovering the requested inputs failed: its message.
     pub error: Option<String>,
+    /// `docProps/app.xml` `Application` of the package, when it has one.
+    pub producer: Option<String>,
     /// Import warnings, in the order the importer produced them.
     pub warnings: Vec<String>,
     pub calc: CalcReport,
@@ -357,6 +359,7 @@ fn check_inner(path: &str, bytes: &[u8], opts: &Options) -> FileReport {
         }
     };
     report.warnings = warnings;
+    report.producer = producer(bytes);
     let mut fresh = cached.clone();
     let mut calc = Calc::new();
     calc.recalc_all(&mut fresh);

@@ -145,6 +145,21 @@ fn read_zip_part_within(zip: &mut Zip<'_>, name: &str, budget: &mut u64) -> Resu
     Ok(buf)
 }
 
+/// The application that saved the package: the text of `<Application>` in `docProps/app.xml`
+/// ("Microsoft Excel", "LibreOffice/7.3...", "Apache POI"). `None` when the part or element is
+/// missing. Cached values from a producer that isn't Excel are a weaker oracle.
+pub(super) fn producer(bytes: &[u8]) -> Option<String> {
+    let mut zip = zip::ZipArchive::new(Cursor::new(bytes)).ok()?;
+    let names = zip_names(&mut zip);
+    let name = names.iter().find(|n| part_key(n) == "docprops/app.xml").cloned()?;
+    let xml = read_zip_part(&mut zip, &name).ok()?;
+    let text = String::from_utf8_lossy(&xml);
+    let start = text.find("<Application>")? + "<Application>".len();
+    let end = start + text[start..].find("</Application>")?;
+    let app = text[start..end].trim();
+    (!app.is_empty()).then(|| app.to_string())
+}
+
 /// Whether the producer flagged its cached results as stale with `<calcPr fullCalcOnLoad="1">`:
 /// libraries that don't calculate write it, and store 0 or nothing as every formula's value.
 pub(super) fn full_calc_on_load(bytes: &[u8]) -> bool {

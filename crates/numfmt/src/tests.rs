@@ -673,7 +673,7 @@ fn text_uncached(v: &Value, code: &str, sys: DateSystem) -> Result<String, CellE
     if !n.is_finite() {
         return Err(CellError::Num);
     }
-    let (f, overflow) = fmt.format_number(n, sys);
+    let (f, overflow) = fmt.format_number_with(n, sys, true);
     if overflow { Err(CellError::Value) } else { Ok(f.text) }
 }
 
@@ -900,4 +900,31 @@ fn closed_brackets_still_hold_their_semicolons() {
     assert_eq!(parse::parse_sections("[unknown;x]0;0").len(), 2);
     assert_eq!(f("0\\[0", 5.0), "0[5");
     assert_eq!(f("\"[\"0;0", 5.0), "[5");
+}
+
+/// Excel (Mac, `ElapsedFormatTests.xlsx` in the POI corpus) reads `m` right after seconds as
+/// minutes, and shows a plain h/m/s token beside an elapsed `[h]`/`[m]`/`[s]` of the same unit as
+/// the elapsed count. 3.14159 days = 75:23:53.
+#[test]
+fn minutes_after_seconds_and_plain_tokens_beside_elapsed() {
+    let n = 314_159.0 / 100_000.0;
+    assert_eq!(f("s:m\" @ hour \"[hh]", n), "53:23 @ hour 75");
+    assert_eq!(f("\"It was \"[h]\" [yes, \"h\"] hours and \"mm:ss", n), "It was 75 [yes, 75] hours and 23:53");
+    assert_eq!(f("[s]\" [yes, \"ss\"] seconds\"", n), "271433 [yes, 271433] seconds");
+    // Unchanged: m between a date part and a time part stays a month.
+    assert_eq!(f("m/d/yyyy", 45000.0), "3/15/2023");
+}
+
+/// `ElapsedFormatTests.xlsx` (POI corpus, cached by Excel for Mac): TEXT of a negative value through
+/// a format with an elapsed part keeps the minus sign; without one it is still #VALUE!.
+#[test]
+fn text_of_negative_with_elapsed_part() {
+    assert_eq!(text_function(&Value::Number(-1.5), "[h]:mm", S), Ok("-36:00".to_string()));
+    assert_eq!(
+        text_function(&Value::Number(-314_159.0 / 100_000.0), "[s]\" [yes, \"ss\"] seconds\"", S),
+        Ok("-271433 [yes, 271433] seconds".to_string())
+    );
+    assert_eq!(text_function(&Value::Number(-1.5), "h:mm", S), Err(CellError::Value));
+    // A cell still can't show it.
+    assert_eq!(f("[h]:mm", -1.5), "########");
 }

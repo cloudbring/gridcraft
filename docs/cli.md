@@ -120,6 +120,7 @@ added, a changed meaning bumps the version):
   "tolerance": 1e-9,
   "files": [{
     "path": "book.xlsx",
+    "producer": "Microsoft Excel",     // docProps/app.xml Application, null when absent
     "opened": true,
     "error": null,                     // GridCraft's message when the file can't be opened
     "warnings": ["..."],               // import warnings

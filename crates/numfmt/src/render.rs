@@ -82,6 +82,10 @@ pub(crate) fn render_date(sec: &Section, v: f64, sys: DateSystem) -> Option<Out>
     let pad = |n: i64, w: u8| if w >= 2 { format!("{:0w$}", n, w = w.min(20) as usize) } else { n.to_string() };
     let month_name = MONTHS.get((dt.month as usize).wrapping_sub(1)).copied().unwrap_or("");
     let day_name = WEEKDAYS.get(dt.weekday as usize).copied().unwrap_or("");
+    // A plain h/m/s token beside an elapsed token of the same unit shows the elapsed count (Excel).
+    let has = |f: fn(&DatePart) -> bool| sec.toks.iter().any(|t| matches!(t, Tok::Date(d) if f(d)));
+    let (elapsed_h, elapsed_m, elapsed_s) =
+        (has(|d| matches!(d, DatePart::ElapsedH(_))), has(|d| matches!(d, DatePart::ElapsedM(_))), has(|d| matches!(d, DatePart::ElapsedS(_))));
     let mut out = Out::default();
     for t in &sec.toks {
         match t {
@@ -105,6 +109,9 @@ pub(crate) fn render_date(sec: &Section, v: f64, sys: DateSystem) -> Option<Out>
                         3 => day_name.chars().take(3).collect(),
                         _ => day_name.to_string(),
                     },
+                    DatePart::Hour(n) if elapsed_h => pad(total_ms / 3_600_000, n),
+                    DatePart::Minute(n) if elapsed_m => pad(total_ms / 60_000, n),
+                    DatePart::Second(n) if elapsed_s => pad(total_ms / 1000, n),
                     DatePart::Hour(n) => {
                         let h = if ampm {
                             let h = hour % 12;

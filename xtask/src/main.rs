@@ -6,6 +6,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used, clippy::panic))]
 
 mod assets;
+mod corpus_check;
 mod i18n_report;
 mod ico;
 mod keytips;
@@ -26,6 +27,9 @@ commands:
                   parity --check, keytips --check (stops at the first failure; the parity check runs
                   only if docs/parity-checklist.md exists)
   test            workspace tests (cargo nextest when installed, else cargo test), then doctests
+  check-corpus [--update-baseline]
+                  gridcraft-cli check over the Office corpora (GRIDCRAFT_OFFICE_CORPUS; GRIDCRAFT_REQUIRE_OFFICE_CORPUS=1 fails
+                  instead of skipping when absent); fails on crashes and regressions vs baselines/xlsx-corpus.json
   assets          check that every icon/image/font/sample file is attributed in ATTRIBUTION.md
   i18n-report     list the interface strings each language doesn't translate yet (always passes)
   layers          enforce the crate dependency layering (AGENTS.md \"Layering\")
@@ -47,6 +51,7 @@ fn main() -> ExitCode {
     let result = match args.first().map(String::as_str) {
         Some("assets") => assets::run(&root()),
         Some("i18n-report") => i18n_report::run(&root()),
+        Some("check-corpus") => corpus_check::run(&root(), &rest),
         Some("layers") => cmd_layers(),
         Some("wasm") => cmd_wasm(),
         Some("test") => cmd_test().and_then(|()| cmd_doctest()),
@@ -83,7 +88,7 @@ pub fn cargo() -> Command {
     c
 }
 
-fn run(mut cmd: Command, what: &str) -> Result<(), String> {
+pub fn run(mut cmd: Command, what: &str) -> Result<(), String> {
     eprintln!("$ {what}");
     let status = cmd.status().map_err(|e| format!("{what}: failed to spawn: {e}"))?;
     if status.success() { Ok(()) } else { Err(format!("{what}: exited with {status}")) }

@@ -408,7 +408,7 @@ fn json_schema_keys() {
     assert_eq!(keys(&v), set(&["schema", "tolerance", "files", "totals", "functions", "signatures"]));
     assert_eq!(v["schema"], SCHEMA);
     let f = &v["files"][0];
-    assert_eq!(keys(f), set(&["path", "opened", "error", "warnings", "calc", "roundTrip"]));
+    assert_eq!(keys(f), set(&["path", "producer", "opened", "error", "warnings", "calc", "roundTrip"]));
     assert_eq!(
         keys(&f["calc"]),
         set(&[
@@ -469,4 +469,18 @@ fn json_schema_keys() {
         ])
     );
     assert_eq!(keys(&v["functions"][0]), set(&["name", "checked", "mismatched", "primary"]));
+}
+
+#[test]
+fn producer_reads_application_from_app_xml() {
+    use std::io::Write;
+    let mut buf = Vec::new();
+    {
+        let mut z = zip::ZipWriter::new(std::io::Cursor::new(&mut buf));
+        z.start_file("docProps/app.xml", zip::write::SimpleFileOptions::default()).unwrap();
+        z.write_all(b"<Properties><Application>Microsoft Excel</Application></Properties>").unwrap();
+        z.finish().unwrap();
+    }
+    assert_eq!(producer(&buf).as_deref(), Some("Microsoft Excel"));
+    assert_eq!(producer(b"not a zip"), None);
 }

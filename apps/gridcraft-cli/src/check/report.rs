@@ -92,6 +92,7 @@ pub fn report_json(reports: &[FileReport], opts: &Options) -> Json {
                 .collect();
             json!({
                 "path": r.path,
+                "producer": r.producer,
                 "opened": r.error.is_none(),
                 "error": r.error,
                 "warnings": r.warnings,

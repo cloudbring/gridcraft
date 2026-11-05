@@ -473,7 +473,7 @@ fn analyze(raw: Raw) -> Section {
 }
 
 fn analyze_date(mut toks: Vec<Tok>, mut sec: Section) -> Section {
-    // m/mm after hours or before seconds means minutes.
+    // m/mm after hours or next to seconds (before or after) means minutes; Excel reads `s:m` that way.
     for i in 0..toks.len() {
         let Some(Tok::Date(DatePart::Month(n))) = toks.get(i) else { continue };
         let n = *n;
@@ -484,7 +484,8 @@ fn analyze_date(mut toks: Vec<Tok>, mut sec: Section) -> Section {
         let next = toks.get(i + 1..).and_then(|s| s.iter().find_map(date_part));
         let after_h = matches!(prev, Some(DatePart::Hour(_) | DatePart::ElapsedH(_)));
         let before_s = matches!(next, Some(DatePart::Second(_) | DatePart::ElapsedS(_)));
-        if (after_h || before_s)
+        let after_s = matches!(prev, Some(DatePart::Second(_) | DatePart::ElapsedS(_)));
+        if (after_h || before_s || after_s)
             && let Some(t) = toks.get_mut(i)
         {
             *t = Tok::Date(DatePart::Minute(n));

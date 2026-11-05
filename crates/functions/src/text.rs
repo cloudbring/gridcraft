@@ -1,6 +1,6 @@
 //! Text functions.
 
-use aho_corasick::{AhoCorasickBuilder, MatchKind};
+use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
 use gridcraft_core::parse::parse_number_text_in;
 use gridcraft_core::{CellError, Value, number_to_text};
 
@@ -542,37 +542,86 @@ fn delimiters(v: &Value) -> R<Vec<Vec<char>>> {
     as_array(v).iter().map(|d| d.to_text().map(|s| chars(&s))).collect()
 }
 
-/// Non-overlapping delimiter matches (start, end) in char positions, in ascending order. Scans left
-/// to right preferring the longest delimiter starting at each position, or (`from_end`) right to
-/// left preferring the longest delimiter ending at each position. Empty delimiters are ignored unless all
-/// delimiters are empty, in which case every position matches with zero length.
-fn find_matches(text: &[char], delims: &[Vec<char>], insensitive: bool, from_end: bool) -> Vec<(usize, usize)> {
-    let t = if insensitive { fold(text) } else { text.to_vec() };
-    let ds: Vec<Vec<char>> = delims.iter().filter(|d| !d.is_empty()).map(|d| if insensitive { fold(d) } else { d.clone() }).collect();
-    if ds.is_empty() {
-        return (0..=t.len()).map(|i| (i, i)).collect();
-    }
-    let mut out = Vec::new();
-    if from_end {
-        let mut j = t.len();
-        while j > 0 {
-            let best =
-                ds.iter().filter(|d| j.checked_sub(d.len()).and_then(|st| t.get(st..j)).is_some_and(|w| w == d.as_slice())).map(Vec::len).max();
-            match best {
-                Some(l) => {
-                    out.push((j - l, j));
-                    j -= l;
-                }
-                None => j -= 1,
-            }
+/// Texts shorter than this (in chars) skip the Aho-Corasick automaton: its per-call setup (building a
+/// `String` haystack, the search state) costs more than the first-byte scan saves.
+const AUTOMATON_MIN_CHARS: usize = 2048;
+
+/// Delimiter matcher built once per function call and reused for every text it scans (TEXTSPLIT
+/// scans once per row). Holds the (case-folded) delimiters, a first-byte dispatch table, and, for more
+/// than three delimiters, an Aho-Corasick automaton used on long texts.
+struct Matcher {
+    insensitive: bool,
+    /// Non-empty delimiters, folded when `insensitive`.
+    ds: Vec<Vec<char>>,
+    /// Indexes into `ds` by the first UTF-8 byte of each delimiter.
+    dispatch: Vec<Vec<usize>>,
+    /// Built on first use by a text of at least `AUTOMATON_MIN_CHARS`; `None` inside means it could not be built.
+    automaton: std::cell::OnceCell<Option<AhoCorasick>>,
+    /// Whether an automaton is worthwhile for this delimiter set (more than three delimiters).
+    wants_automaton: bool,
+}
+
+impl Matcher {
+    fn new(delims: &[Vec<char>], insensitive: bool) -> Self {
+        let ds: Vec<Vec<char>> = delims.iter().filter(|d| !d.is_empty()).map(|d| if insensitive { fold(d) } else { d.clone() }).collect();
+        let mut dispatch: Vec<Vec<usize>> = vec![Vec::new(); 256];
+        for (k, delim) in ds.iter().enumerate() {
+            let mut bytes = [0; 4];
+            let first = delim[0].encode_utf8(&mut bytes).as_bytes()[0];
+            dispatch[usize::from(first)].push(k);
         }
-        out.reverse();
-        return out;
+        let wants_automaton = ds.len() > 3;
+        Self { insensitive, ds, dispatch, automaton: std::cell::OnceCell::new(), wants_automaton }
     }
-    if ds.len() > 3 {
-        let haystack: String = t.iter().collect();
-        let patterns: Vec<String> = ds.iter().map(|d| d.iter().collect()).collect();
-        if let Ok(matcher) = AhoCorasickBuilder::new().match_kind(MatchKind::LeftmostLongest).build(&patterns) {
+
+    /// The automaton, built lazily, when it is worthwhile for a text of `len` chars.
+    fn automaton(&self, len: usize) -> Option<&AhoCorasick> {
+        if !self.wants_automaton || len < AUTOMATON_MIN_CHARS {
+            return None;
+        }
+        self.automaton
+            .get_or_init(|| {
+                let patterns: Vec<String> = self.ds.iter().map(|d| d.iter().collect()).collect();
+                AhoCorasickBuilder::new().match_kind(MatchKind::LeftmostLongest).build(&patterns).ok()
+            })
+            .as_ref()
+    }
+
+    /// Non-overlapping delimiter matches (start, end) in char positions, in ascending order. Scans left
+    /// to right preferring the longest delimiter starting at each position, or (`from_end`) right to
+    /// left preferring the longest delimiter ending at each position. Empty delimiters are ignored unless
+    /// all delimiters are empty, in which case every position matches with zero length.
+    fn find(&self, text: &[char], from_end: bool) -> Vec<(usize, usize)> {
+        let folded;
+        let t: &[char] = if self.insensitive {
+            folded = fold(text);
+            &folded
+        } else {
+            text
+        };
+        let ds = &self.ds;
+        if ds.is_empty() {
+            return (0..=t.len()).map(|i| (i, i)).collect();
+        }
+        let mut out = Vec::new();
+        if from_end {
+            let mut j = t.len();
+            while j > 0 {
+                let best =
+                    ds.iter().filter(|d| j.checked_sub(d.len()).and_then(|st| t.get(st..j)).is_some_and(|w| w == d.as_slice())).map(Vec::len).max();
+                match best {
+                    Some(l) => {
+                        out.push((j - l, j));
+                        j -= l;
+                    }
+                    None => j -= 1,
+                }
+            }
+            out.reverse();
+            return out;
+        }
+        if let Some(matcher) = self.automaton(t.len()) {
+            let haystack: String = t.iter().collect();
             let mut positions = haystack.char_indices().map(|(byte, _)| byte).chain(std::iter::once(haystack.len())).enumerate();
             let mut current = positions.next();
             for hit in matcher.find_iter(&haystack) {
@@ -588,27 +637,30 @@ fn find_matches(text: &[char], delims: &[Vec<char>], insensitive: bool, from_end
             }
             return out;
         }
-    }
-    let mut dispatch: [Vec<&[char]>; 256] = std::array::from_fn(|_| Vec::new());
-    for delim in &ds {
-        let mut bytes = [0; 4];
-        let first = delim[0].encode_utf8(&mut bytes).as_bytes()[0];
-        dispatch[usize::from(first)].push(delim);
-    }
-    let mut i = 0;
-    while i < t.len() {
-        let mut bytes = [0; 4];
-        let first = t[i].encode_utf8(&mut bytes).as_bytes()[0];
-        let best = dispatch[usize::from(first)].iter().filter(|d| t.get(i..i + d.len()).is_some_and(|w| w == **d)).map(|d| d.len()).max();
-        match best {
-            Some(l) => {
-                out.push((i, i + l));
-                i += l;
+        let mut i = 0;
+        while i < t.len() {
+            let mut bytes = [0; 4];
+            let first = t[i].encode_utf8(&mut bytes).as_bytes()[0];
+            let best = self.dispatch[usize::from(first)]
+                .iter()
+                .map(|&k| &ds[k])
+                .filter(|d| t.get(i..i + d.len()).is_some_and(|w| w == d.as_slice()))
+                .map(Vec::len)
+                .max();
+            match best {
+                Some(l) => {
+                    out.push((i, i + l));
+                    i += l;
+                }
+                None => i += 1,
             }
-            None => i += 1,
         }
+        out
     }
-    out
+}
+
+fn find_matches(text: &[char], delims: &[Vec<char>], insensitive: bool, from_end: bool) -> Vec<(usize, usize)> {
+    Matcher::new(delims, insensitive).find(text, from_end)
 }
 
 fn text_before_after(a: &[Arg], before: bool) -> R<Value> {
@@ -649,13 +701,18 @@ fn textafter(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     text_before_after(a, false)
 }
 
+#[cfg(test)]
 fn split_by(s: &[char], delims: &[Vec<char>], insensitive: bool) -> Vec<Vec<char>> {
+    split_with(s, delims, &Matcher::new(delims, insensitive))
+}
+
+fn split_with(s: &[char], delims: &[Vec<char>], matcher: &Matcher) -> Vec<Vec<char>> {
     if delims.iter().all(Vec::is_empty) {
         return vec![s.to_vec()];
     }
     let mut out = Vec::new();
     let mut last = 0;
-    for (st, en) in find_matches(s, delims, insensitive, false) {
+    for (st, en) in matcher.find(s, false) {
         out.push(s[last..st].to_vec());
         last = en;
     }
@@ -677,12 +734,14 @@ fn textsplit(a: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     }
     let pad = if has(a, 5) { scalar(arg(a, 5)?) } else { Value::Error(CellError::NA) };
     let mut rows: Vec<Vec<String>> = Vec::new();
-    for r in split_by(&s, &row_d, mode == 1) {
+    let row_m = Matcher::new(&row_d, mode == 1);
+    let col_m = Matcher::new(&col_d, mode == 1);
+    for r in split_with(&s, &row_d, &row_m) {
         if ignore && r.is_empty() {
             continue;
         }
         let cells: Vec<String> =
-            split_by(&r, &col_d, mode == 1).into_iter().filter(|c| !(ignore && c.is_empty())).map(|c| c.into_iter().collect()).collect();
+            split_with(&r, &col_d, &col_m).into_iter().filter(|c| !(ignore && c.is_empty())).map(|c| c.into_iter().collect()).collect();
         if ignore && cells.is_empty() {
             continue;
         }
@@ -1156,6 +1215,22 @@ mod tests {
             }
             expected.push(text[start..].to_vec());
             prop_assert_eq!(super::split_by(&text, &overlaps, insensitive), expected);
+        }
+    }
+
+    /// Texts at and above the automaton threshold take the Aho-Corasick path; it must agree with the scan.
+    #[test]
+    fn automaton_path_agrees_with_old_scan() {
+        let delims: Vec<Vec<char>> = ["ab", "b", "xyz", "é", "😀x", "Q"].iter().map(|d| d.chars().collect()).collect();
+        for len in [super::AUTOMATON_MIN_CHARS - 1, super::AUTOMATON_MIN_CHARS, super::AUTOMATON_MIN_CHARS * 3 + 1] {
+            let text: Vec<char> = "abxyzéq😀xQb c".chars().cycle().take(len).collect();
+            for insensitive in [false, true] {
+                assert_eq!(
+                    super::find_matches(&text, &delims, insensitive, false),
+                    old_matches(&text, &delims, insensitive, false),
+                    "{len} {insensitive}"
+                );
+            }
         }
     }
 

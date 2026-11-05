@@ -74,3 +74,32 @@ With a single row the setup is paid once and the gain appears (2.0-2.65x). A fix
 - General claim: not supported. On real text split into rows, NEW is 1.1-17x slower for every delimiter count (1.5x slower at 1 delimiter, up to 17x at 8). Gain exists only for a single large row, 2-2.7x with 8 real delimiters.
 - Status page wording should say: "TEXTSPLIT 8x on one 1 MiB string with 8 delimiters; slower on multi-row input (0.06-0.9x) pending a fix that builds the matcher once per call".
 - Not measured: matcher-only time, case-insensitive mode, reverse search, Excel-spill through the calc engine (no workbook contains TEXTSPLIT).
+
+## Fix for the multi-row regression (artcraft-algorithms#222)
+
+Change (`crates/functions/src/text.rs`): a `Matcher` (folded delimiters, first-byte dispatch, lazily built Aho-Corasick automaton) is built once per TEXTSPLIT call, one for row and one for
+column delimiters, and reused for every row. The automaton is built only when a text of at least 2,048 chars is scanned (`AUTOMATON_MIN_CHARS`); shorter texts (every row of real multi-row input)
+use the dispatch scan, so no per-row automaton setup remains. Case-sensitive scans no longer copy the text. `find_matches` stays as a one-shot wrapper (TEXTBEFORE/TEXTAFTER, tests).
+Tests: the property test against the old scan still passes; `automaton_path_agrees_with_old_scan` covers texts below, at and above the threshold.
+
+Re-run: same harness and method as above (40 runs/side, ABBA/BAAB, OLD = 85e51e00), after the change, on 2026-11-04 (about 7:02 PM EST), load 5.2-6.0 on 12 cores, every report
+`publishable: true, contended: false`. Outputs identical OLD vs NEW on all 33 inputs (assert). Data: `data/after-222/`.
+`real-strings.txt` was regenerated for this run (the original file was not kept): `<t>` text of the shared strings of the first 710 corpus workbooks, newline-joined, 3.7 MB; numbers for the
+real-text class are therefore not byte-comparable with the table above, but the shape is the same.
+
+Result (speedup = old/new wall [95% CI]); **all 33 inputs are faster; the lowest CI lower bound is 1.09x** (target was >= 0.97):
+
+| class | before fix (this section's earlier table) | after fix |
+|---|---|---|
+| claim shape, 8 delimiters, 1 MiB one row | 8.61x [7.93, 8.89] | 8.41x [8.17, 8.93] |
+| claim shape, 1 / 3 / 4 / 16 delimiters | 1.63x / 3.17x / 5.10x / 14.98x | 1.47x [1.45, 1.50] / 2.83x [2.74, 3.20] / 4.71x [4.67, 5.34] / 14.80x [14.64, 15.19] |
+| real text, rows by newline, 1 delim, 1 kB / 10 kB / 100 kB / 1 MB | 0.71x / 0.84x / 0.78x / 0.66x | 1.30x [1.17, 1.38] / 1.18x [1.16, 1.21] / 1.11x [1.09, 1.12] / 1.36x [1.34, 1.37] |
+| real text, rows by newline, 3 delims | 0.78x - 0.88x | 1.53x [1.40, 1.57] / 1.35x [1.32, 1.38] / 1.24x [1.22, 1.25] / 1.73x [1.71, 1.75] |
+| real text, rows by newline, 8 delims | 0.06x - 0.10x | 2.20x [2.15, 2.28] / 1.85x [1.82, 1.90] / 1.60x [1.59, 1.62] / 2.78x [2.74, 2.81] |
+| real text, one row, 8 delims, 1 kB / 10 kB / 100 kB / 1 MB | 0.88x / 1.82x / 2.65x / 2.35x | 2.25x [1.96, 2.35] / 2.02x [1.90, 2.12] / 1.99x [1.96, 2.04] / 2.33x [2.31, 2.37] |
+| scaled synthetic, 1k-100k cells | 0.12x - 1.45x (8 delims 0.12-0.15x) | 1.15x [1.13, 1.17] - 2.34x [2.29, 2.39], geomean 1.64x [1.62, 1.65] |
+| geomean per class | | original-shape 4.76x, real-text 1.68x, scaled-synthetic 1.64x |
+
+Per-input tables with CIs: `data/after-222/textsplit-*.md`.
+
+Updated verdict: the 7.8x claim for its shape still reproduces (8.41x [8.17, 8.93]), and the multi-row regression is gone: no input class is slower than OLD.

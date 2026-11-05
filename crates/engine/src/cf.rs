@@ -2,7 +2,7 @@
 //! gets.
 
 use std::cell::RefCell;
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 
 use gridcraft_core::{CellRef, RangeRef, Value, compare};
 use gridcraft_model::{CfOperator, CfRule, CfValueKind, Color, CondFormat, PatternType, Sheet, Style, Underline, Workbook, default_icon_thresholds};
@@ -32,13 +32,23 @@ pub struct CfCache {
     legacy: bool,
 }
 
+/// Compiled rule formulas keyed by their text, so a formula shared by many cells (or rules) is parsed once.
+/// Bounded: when full, the least recently used entry is dropped.
 #[derive(Default)]
 struct FormulaCache {
-    entries: HashMap<String, Option<gridcraft_formula::Expr>>,
-    recent: VecDeque<String>,
+    entries: HashMap<String, FormulaEntry>,
+    /// Use counter; an entry's `used` is the counter value at its last use.
+    clock: u64,
     #[cfg(test)]
     legacy: bool,
 }
+
+struct FormulaEntry {
+    expr: Option<gridcraft_formula::Expr>,
+    used: u64,
+}
+
+const FORMULA_CACHE_MAX: usize = 512;
 
 impl FormulaCache {
     fn evaluate(&mut self, wb: &Workbook, sheet: usize, at: CellRef, first: CellRef, formula: &str) -> Value {
@@ -47,17 +57,20 @@ impl FormulaCache {
             return gridcraft_calc::evaluate(wb, sheet, at, &relative(formula, first, at));
         }
         let body = formula.strip_prefix('=').unwrap_or(formula);
-        if !self.entries.contains_key(body) {
-            if self.entries.len() >= 512
-                && let Some(oldest) = self.recent.pop_front()
+        self.clock += 1;
+        let now = self.clock;
+        if let Some(entry) = self.entries.get_mut(body) {
+            entry.used = now;
+        } else {
+            if self.entries.len() >= FORMULA_CACHE_MAX
+                && let Some(oldest) = self.entries.iter().min_by_key(|(_, entry)| entry.used).map(|(key, _)| key.clone())
             {
                 self.entries.remove(&oldest);
             }
-            self.entries.insert(body.to_owned(), gridcraft_formula::parse(body).ok());
+            self.entries.insert(body.to_owned(), FormulaEntry { expr: gridcraft_formula::parse(body).ok(), used: now });
         }
-        self.recent.retain(|key| key != body);
-        self.recent.push_back(body.to_owned());
-        match self.entries.get(body).and_then(Option::as_ref) {
+        match self.entries.get(body).and_then(|entry| entry.expr.as_ref()) {
+            Some(expr) if at == first => gridcraft_calc::recalc::evaluate_expr(wb, sheet, at, expr),
             Some(expr) => {
                 let shifted =
                     gridcraft_formula::adjust::shift_relative(expr.clone(), at.row as i64 - first.row as i64, at.col as i64 - first.col as i64);
@@ -68,23 +81,61 @@ impl FormulaCache {
     }
 }
 
+/// Hasher for the segment-tree node numbers: they are small dense integers, so one multiply is enough
+/// (SipHash cost more per lookup than the whole scan it was avoiding on small rule sets).
+#[derive(Default)]
+struct NodeHasher(u64);
+
+impl std::hash::Hasher for NodeHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.0 = (self.0.rotate_left(5) ^ u64::from(*byte)).wrapping_mul(0x517c_c1b7_2722_0a95);
+        }
+    }
+
+    fn write_u32(&mut self, value: u32) {
+        self.0 = (u64::from(value) ^ 0x9e37_79b9).wrapping_mul(0x517c_c1b7_2722_0a95);
+    }
+}
+
+type NodeMap<V> = HashMap<u32, V, std::hash::BuildHasherDefault<NodeHasher>>;
+
+/// Up to this many (range, rule) pairs a linear scan over them beats the tree: a lookup walks 14 tree
+/// levels, while each pair costs a handful of comparisons. Real workbooks have a few rules per sheet.
+const LINEAR_MAX: usize = 24;
+
 #[derive(Default)]
 struct SheetIndex {
-    columns: HashMap<u32, RangeIndex>,
+    /// Bounding box of every rule range (first row, last row, first col, last col): cells outside it match nothing.
+    bounds: Option<[u32; 4]>,
+    /// Every (range, rule) pair when there are at most `LINEAR_MAX` of them; the tree is not built then.
+    linear: Vec<(RangeRef, usize)>,
+    columns: NodeMap<RangeIndex>,
 }
 
 impl SheetIndex {
     fn new(rules: &[CondFormat]) -> Self {
-        let mut columns: HashMap<u32, Vec<(RangeRef, usize)>> = HashMap::new();
-        for (id, rule) in rules.iter().enumerate() {
-            for range in &rule.ranges {
-                Self::insert(&mut columns, *range, id, 1, 0, gridcraft_core::MAX_COLS - 1);
-            }
+        let pairs: Vec<(RangeRef, usize)> =
+            rules.iter().enumerate().flat_map(|(id, rule)| rule.ranges.iter().map(move |range| (*range, id))).collect();
+        let bounds = pairs.iter().fold(None, |acc: Option<[u32; 4]>, (range, _)| {
+            let r = [range.start.row, range.end.row, range.start.col, range.end.col];
+            Some(acc.map_or(r, |a| [a[0].min(r[0]), a[1].max(r[1]), a[2].min(r[2]), a[3].max(r[3])]))
+        });
+        if pairs.len() <= LINEAR_MAX {
+            return Self { bounds, linear: pairs, columns: NodeMap::default() };
         }
-        Self { columns: columns.into_iter().map(|(node, items)| (node, RangeIndex::new(items))).collect() }
+        let mut columns: NodeMap<Vec<(RangeRef, usize)>> = NodeMap::default();
+        for (range, id) in pairs {
+            Self::insert(&mut columns, range, id, 1, 0, gridcraft_core::MAX_COLS - 1);
+        }
+        Self { bounds, linear: Vec::new(), columns: columns.into_iter().map(|(node, items)| (node, RangeIndex::new(items))).collect() }
     }
 
-    fn insert(columns: &mut HashMap<u32, Vec<(RangeRef, usize)>>, range: RangeRef, id: usize, node: u32, start: u32, end: u32) {
+    fn insert(columns: &mut NodeMap<Vec<(RangeRef, usize)>>, range: RangeRef, id: usize, node: u32, start: u32, end: u32) {
         if range.end.col < start || range.start.col > end {
             return;
         }
@@ -101,7 +152,13 @@ impl SheetIndex {
     }
 
     fn query(&self, cell: CellRef, result: &mut Vec<usize>) {
-        if cell.col >= gridcraft_core::MAX_COLS {
+        if cell.col >= gridcraft_core::MAX_COLS
+            || !self.bounds.is_some_and(|b| b[0] <= cell.row && cell.row <= b[1] && b[2] <= cell.col && cell.col <= b[3])
+        {
+            return;
+        }
+        if !self.linear.is_empty() {
+            result.extend(self.linear.iter().filter(|(range, _)| range.contains(cell)).map(|(_, id)| *id));
             return;
         }
         let (mut node, mut start, mut end) = (1, 0, gridcraft_core::MAX_COLS - 1);
@@ -400,6 +457,9 @@ impl CfCache {
         {
             let index = self.indices.entry(sheet).or_insert_with(|| SheetIndex::new(&sh.cond_formats));
             index.query(c, &mut candidates);
+        }
+        if candidates.is_empty() {
+            return None;
         }
         candidates.sort_unstable();
         candidates.dedup();
@@ -818,6 +878,36 @@ mod tests {
             cache.look(&d.wb, 0, CellRef::parse(&format!("A{r}")).unwrap());
         }
         assert_eq!(SCANNED.with(|n| n.get()), 10_000);
+    }
+
+    /// Excel computes a colour scale's, data bar's or icon set's statistics over the rule's own range on its own
+    /// sheet (ECMA-376 18.18.14 ST_CfvoType: "the minimum value in the range"). One cache serving several sheets
+    /// must not let the second sheet's rule reuse the first sheet's minimum, maximum or percentiles (#223).
+    #[test]
+    fn rule_statistics_are_per_sheet_when_one_cache_serves_two_sheets() {
+        let mut s = crate::Session::new();
+        s.new_workbook();
+        s.execute("range.setValues", json!({"range": "A1", "values": [[1], [2], [3]]})).unwrap();
+        s.execute("home.conditionalFormat", json!({"range": "A1:A3", "rule": {"type": "colorScale"}})).unwrap();
+        s.execute("home.conditionalFormat", json!({"range": "A1:A3", "rule": {"type": "top10", "rank": 1, "preset": "redBorder"}})).unwrap();
+        s.execute("home.insertSheet", json!({"name": "Second"})).unwrap();
+        s.execute("range.setValues", json!({"range": "A1", "values": [[100], [200], [300]]})).unwrap();
+        s.execute("home.conditionalFormat", json!({"range": "A1:A3", "rule": {"type": "colorScale"}})).unwrap();
+        s.execute("home.conditionalFormat", json!({"range": "A1:A3", "rule": {"type": "top10", "rank": 1, "preset": "redBorder"}})).unwrap();
+        let d = s.doc().unwrap();
+        assert!(d.wb.sheet(1).is_some_and(|sh| !sh.cond_formats.is_empty()), "rules landed on the second sheet");
+        let mut shared = CfCache::new();
+        // Sheet 0 first, so that its statistics are in the cache when sheet 1 is looked up.
+        let first: Vec<_> = (1..=3).map(|r| shared.look(&d.wb, 0, CellRef::parse(&format!("A{r}")).unwrap())).collect();
+        for r in 1..=3 {
+            let cell = CellRef::parse(&format!("A{r}")).unwrap();
+            // The second sheet's 100/200/300 sit at the same relative places as 1/2/3: same colours, same top-1 border.
+            let second = shared.look(&d.wb, 1, cell);
+            assert_eq!(second, first[r - 1], "A{r}");
+            assert_eq!(second, CfCache::new().look(&d.wb, 1, cell), "shared cache == fresh cache for A{r}");
+        }
+        assert_eq!(first[0].as_ref().and_then(|l| l.scale_fill), Some([0xF8, 0x69, 0x6B]));
+        assert_eq!(first[2].as_ref().and_then(|l| l.scale_fill), Some([0x63, 0xBE, 0x7B]));
     }
 
     #[test]

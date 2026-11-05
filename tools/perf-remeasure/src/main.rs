@@ -160,8 +160,45 @@ fn xlsx_files(dir: &Path) -> Vec<PathBuf> {
     out
 }
 
+/// `perf-remeasure quick CORPUS_DIR SUBSTRING...`: mean time per paint, OLD vs NEW, for the corpus files whose path
+/// contains one of the substrings (a fast loop for profiling; not a publishable measurement).
+fn quick(a: &[String]) {
+    let corpus = PathBuf::from(&a[2]);
+    let pats = &a[3..];
+    for corp in ["office-poi", "office-libreoffice", "office-openxml-sdk"] {
+        for f in xlsx_files(&corpus.join(corp)) {
+            let name = f.display().to_string();
+            if !pats.iter().any(|p| name.contains(p.as_str())) {
+                continue;
+            }
+            let Ok(bytes) = std::fs::read(&f) else { continue };
+            let (Some((o, _)), Some((n, _))) = (old::read(&bytes), new::read(&bytes)) else { continue };
+            let time = |run: &dyn Fn()| {
+                for _ in 0..20 {
+                    run();
+                }
+                let mut best = f64::MAX;
+                for _ in 0..7 {
+                    let t = std::time::Instant::now();
+                    let k = 200;
+                    for _ in 0..k {
+                        run();
+                    }
+                    best = best.min(t.elapsed().as_secs_f64() / f64::from(k));
+                }
+                best * 1e6
+            };
+            let (to, tn) = (time(&|| { black_box(old::paint(&o)); }), time(&|| { black_box(new::paint(&n)); }));
+            println!("{:>9.1} us OLD {:>9.1} us NEW  {:.2}x  {}", to, tn, to / tn, f.file_name().unwrap().to_string_lossy());
+        }
+    }
+}
+
 fn main() {
     let a: Vec<String> = std::env::args().collect();
+    if a.get(1).map(String::as_str) == Some("quick") {
+        return quick(&a);
+    }
     let corpus = PathBuf::from(&a[1]);
     let out_dir = a[2].as_str();
     let reps: usize = a.get(3).and_then(|s| s.parse().ok()).unwrap_or(40);
@@ -228,6 +265,11 @@ fn main() {
             }
         }
         std::fs::write(format!("{out_dir}/cf-{class}-shared-cache-diffs.md"), &shared).unwrap();
+        // Excel semantics: a rule's statistics come from its own range on its own sheet. NEW must therefore render the
+        // same through one cache shared by all sheets as through one cache per sheet (and per-sheet equals OLD, below).
+        for (n, i) in &inputs {
+            assert_eq!(new::canon_shared(&i.new), new::canon(&i.new), "NEW shared-cache output differs from per-sheet in {n}");
+        }
         let mut unequal = String::new();
         let mut kept = Vec::new();
         for (n, i) in inputs {

@@ -65,3 +65,57 @@ In the timed runs each sheet gets its own cache (as the renderer does), where ou
 - Not measured: a cache reused across frames (OLD's persistent stats cache vs NEW's per-paint one), the egui paint itself, workbooks beyond the 78.
 
 Raw JSON: `data/cf-real-*.json`, `data/cf-synthetic.json`; per-input tables: `data/cf-*.md`; census: `data/cf-census.md`.
+
+## Fix: cross-sheet statistics and the small-sheet slowdown (artcraft-algorithms#223)
+
+### (a) Correctness: which output is right when one cache serves several sheets
+
+Decision: **NEW (statistics per sheet and rule) is right; OLD (statistics shared across sheets by rule index) was a bug.** This is an intended fix of #114's behaviour, recorded here, not a regression.
+
+Evidence:
+- Spec: ECMA-376 Part 1, 18.18.14 `ST_CfvoType`: `min` = "the minimum value in the range shall be used as the minimum value for the gradient", `max` likewise, `percent` = "a percentage between the
+  minimum and maximum values in the range", `percentile` = "a percentile ranking in the range" (https://webapp.docx4java.org/OnlineDemo/ecma376/SpreadsheetML/ST_CfvoType.html). "The range" is the rule's own `sqref` on its own sheet.
+  Microsoft's `ColorScaleCriterion.Type` doc agrees that thresholds are determined per rule from number / percent / formula / percentile (https://learn.microsoft.com/en-us/office/vba/api/excel.colorscalecriterion.type). Nothing in either lets sheet 2's rule read sheet 1's cells.
+- OLD keyed `stats` by rule index only and built them from the sheet of whichever lookup came first, so sheet 2's rule 0 used sheet 1's rule 0 numbers.
+- Hand computation on `colorscale.xlsx` (no cached render exists in the file, so the colour is computed from the file's own values and rule): sheet 2, rule on B2:B7 (3-colour, min / percentile 50 / max, red FF0000, green 008000, blue 0000FF), B2..B7 = 1..6.
+  For B3 = 2: min 1, 50th percentile 3.5, so t = (2-1)/(3.5-1) = 0.4 and colour = lerp(red, green, 0.4) = (153, 51, 0). **NEW gives [153, 51, 0]**.
+  OLD reused sheet 1's B3:B6 = 1..4 (percentile 50 = 2.5): t = 1/1.5 = 0.667, colour (85, 85, 0). **OLD gave [85, 85, 0]**, which is exactly what the wrong statistics predict.
+- Harness gate added (`tools/perf-remeasure`): for every one of the 88 inputs, NEW through one cache shared by all sheets must equal NEW with one cache per sheet (assert; passed), and per-sheet NEW equals per-sheet OLD (the existing equivalence gate; 88 of 88). So NEW = Excel's per-sheet semantics everywhere; OLD differs only in the three files below, through the shared cache.
+  Same 3 files differ from OLD as in the first run: `colorscale.xlsx` 7 of 78 cells, `condformat_theme_color.xlsx` 5 of 11, `ConditionalFormattingSamples.xlsx` 207 of 3,688 (`data/after-223/cf-*-shared-cache-diffs.md`).
+- The renderer (`ui-egui` grid, `cmd/print.rs`) already creates one cache per painted sheet, so users never saw the OLD difference in the app; it appears only for a cache reused across sheets.
+- Red-then-green test: `cf::tests::rule_statistics_are_per_sheet_when_one_cache_serves_two_sheets` (two sheets, colour scale and top-1 rule on each, 1/2/3 vs 100/200/300, one shared cache).
+  Red with the OLD keying (`self.stats.entry((0, idx))`): sheet 1 A1 (value 100, its minimum) got fill [99, 190, 123] (the maximum colour) plus the top-1 border instead of [248, 105, 107] and no border. Green with the sheet-and-rule key (the code as committed).
+
+### (b) Performance: what made small real sheets slower, and the fix
+
+Profile (instrumented `look`, then `perf-remeasure quick`): it was not per-paint setup. It was the per-cell index query. `condformat_databar.xlsx` paints 1,000 empty cells with one rule on A1; steady-state `look` cost about 125 ns per cell
+(index query 83-125 ns: a 14-level column tree walk, one SipHash `HashMap` lookup per level) against about 10 ns per cell for OLD's linear check of 1 rule. `FilterByCF.xlsx` and `RelationalPivotB1.xlsx` are the same, plus:
+the per-cell `display()` text was computed for cells with no matching rule, and every formula evaluation did an O(512) `retain` over an LRU `VecDeque<String>` plus a `String` allocation.
+
+Changes (`crates/engine/src/cf.rs`):
+1. Rule sets of up to 24 (range, rule) pairs use a linear scan; the tree is built only beyond that. A bounding box of all rule ranges rejects cells outside every range in four comparisons.
+2. Tree nodes use a one-multiply hasher instead of SipHash (large rule sets).
+3. `look` returns before reading the value and its display text when no rule covers the cell.
+4. Formula cache: use counter instead of `VecDeque::retain`; no `String` allocation on a hit; no expression clone/shift when the cell is the rule's first cell.
+
+Per-file spot check before the full run (`perf-remeasure quick`, best of 7 x 200 paints, not publishable): databar 0.12x to 1.06x, FilterByCF 0.12x to 1.08x, RelationalPivotB1 0.18x to 2.15x, colorscale 0.66x to 1.16x.
+
+Full re-run: same harness and method (40 runs/side, ABBA/BAAB, OLD = 85e51e00), 2026-11-04 about 7:14 PM EST, load 4.2-5.0 on 12 cores, all four reports `publishable: true, contended: false`.
+Equivalence: 88 of 88 inputs identical to OLD (per-sheet caches), plus the shared-vs-per-sheet NEW gate above. Data: `data/after-223/`.
+
+| input class | before (first run) | after fix, speedup old/new wall [95% CI] |
+|---|---|---|
+| real: office-poi (20) | 0.67x [0.66, 0.70] | 1.86x [1.81, 1.91] |
+| real: office-libreoffice (41) | 0.62x [0.61, 0.64] | 1.46x [1.43, 1.49] |
+| real: office-openxml-sdk (17) | 0.32x [0.32, 0.33] | 1.43x [1.39, 1.48] |
+| real, all 78 pooled | 0.55x (no CI) | **1.55x [1.52, 1.57]** (inverse-variance pooled log ratios from per-file CIs, `tools/perf-remeasure/pool.py`) |
+| real files faster / slower / inconclusive (per-file CI) | 17 / 58 / 3 | 55 / 1 / 22 |
+| synthetic, 10 shapes | 1.55x [1.55, 1.55] | 1.74x [1.73, 1.75] |
+| synthetic 50k cells x 200 rules (the claim's shape) | 1.67x [1.65, 1.68] | 1.82x [1.80, 1.82] |
+
+Pooled lower bound 1.52 against a target of 0.97. One file is still significantly slower: `invalid_ext_data_validation.xlsx` 0.91x [0.89, 0.92] (microseconds); the lowest point estimate is `tdf166413.xlsx` 0.86x (CI includes 1.0).
+Big-sheet gains kept and raised: `StructuredRefs-lots-with-lookups.xlsx` 12.25 -> 3.66 ms (3.35x), `tdf171828_fail_to_import_file.xlsx` 11.70 -> 3.27 ms (3.57x), `ConditionalFormattingSamples.xlsx` 1.25 ms -> 571 us (2.19x), `RelationalPivotB1.xlsx` 1.98x.
+The former worst cases: `condformat_databar.xlsx` 1.04x [1.02, 1.06], `FilterByCF.xlsx` 1.05x [1.04, 1.06].
+
+Updated verdict: 2.0x is still not reproduced for the claim's shape (1.82x [1.80, 1.82], outside the CI of 2.0), but conditional formats are no longer slower on real workbooks in aggregate (pooled 1.55x), and the cross-sheet difference is an OLD bug fixed by NEW.
+Not measured: a cache reused across frames, the egui paint, workbooks beyond the 78.

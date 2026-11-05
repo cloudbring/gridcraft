@@ -1,0 +1,1 @@
+- office-poi/spreadsheet/ConditionalFormattingSamples.xlsx: 207 of 3688 cells differ; first: OLD 4:2:5=None || NEW 4:2:5=Some(CfLook { style: Some(Style { font: Font { name: "Calibri", size: 11.0, bold: true, italic: false, underline: None, stri
